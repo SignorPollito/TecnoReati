@@ -89,6 +89,7 @@ public class BasicStartup {
 
     private void registerHardcodedCrimes() {
         crimeRepository.registerCrime(new Crime("Art. 27 CC", 0, 0, 3500));
+        crimeRepository.registerCrime(new Crime("Guida senza casco", 0, 0, 500));
 
         crimeRepository.removeCrime("Mancato scontrino ( Evasione Fiscale )");
         crimeRepository.removeCrime("Scontrino con importo minore (Evasione Fiscale)");

@@ -8,13 +8,14 @@ import java.util.Scanner;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class CrimeCalculator {
+    private static final String[] POSSIBLE_LETTERS = { "A", "B", "C" };
     private static final String ARREST_COMMAND = "/arresto add <NOME> <TEMPO>h <CELLA> <CAUZIONE> <MOTIVO>";
     private static final String CHARGE_COMMAND = "/multa <NOME> <SOLDI> <MOTIVO>";
 
     private static String randomCell() {
         var random = ThreadLocalRandom.current();
 
-        return (random.nextBoolean() ? "A" : "B").concat(String.valueOf(random.nextInt(1, 4)));
+        return (POSSIBLE_LETTERS[random.nextInt(1, POSSIBLE_LETTERS.length)]).concat(String.valueOf(random.nextInt(1, 10)));
     }
 
 
