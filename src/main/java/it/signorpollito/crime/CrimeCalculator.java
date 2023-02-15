@@ -15,7 +15,7 @@ public class CrimeCalculator {
     private static String randomCell() {
         var random = ThreadLocalRandom.current();
 
-        return (POSSIBLE_LETTERS[random.nextInt(1, POSSIBLE_LETTERS.length)]).concat(String.valueOf(random.nextInt(1, 10)));
+        return (POSSIBLE_LETTERS[random.nextInt(0, POSSIBLE_LETTERS.length)]).concat(String.valueOf(random.nextInt(1, 10)));
     }
 
 
