@@ -22,13 +22,13 @@ public class DrugInjector implements Injector {
 
     @Override
     public String getModifiedDisplayName(String name) {
-        return "Possesso di stupefacenti".concat(hided ? " e occultamento prove" : "");
+        return "Possesso di stupefacenti".concat(hided ? " e Art.150-bis del C.P." : "");
     }
 
     @Override
     public String getArrestCommandName(String name) {
         return "Possesso di stupefacenti (Catg. %s)".formatted(name.split(" ")[3])
-                .concat(hided ? " + occultamento prove" : "");
+                .concat(hided ? " + Art.150-bis" : "");
     }
 
     @Override
