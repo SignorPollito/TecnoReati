@@ -12,13 +12,13 @@ public class DocumentsInjector implements Injector {
 
     @Override
     public void askQuestions(Scanner scanner) {
-        if(InputUtils.requestYes(scanner, "Ha il libretto? (y/n) "))
+        if(!InputUtils.requestYes(scanner, "Ha il libretto? (y/n) "))
             documents.add("libretto");
 
-        if(InputUtils.requestYes(scanner, "Ha l'assicurazione? (y/n) "))
+        if(!InputUtils.requestYes(scanner, "Ha l'assicurazione? (y/n) "))
             documents.add("assicurazione");
 
-        if(InputUtils.requestYes(scanner, "Ha il bollo? (y/n) "))
+        if(!InputUtils.requestYes(scanner, "Ha il bollo? (y/n) "))
             documents.add("bollo");
     }
 

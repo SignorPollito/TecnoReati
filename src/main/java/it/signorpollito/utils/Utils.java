@@ -1,5 +1,10 @@
 package it.signorpollito.utils;
 
+import java.awt.*;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+
 public final class Utils {
     private Utils() {}
 
@@ -27,6 +32,22 @@ public final class Utils {
         } catch (NumberFormatException ignored) {}
 
         return fallbackValue;
+    }
+
+    public static boolean openWebpage(URL url) {
+        Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+
+        if (desktop == null || !desktop.isSupported(Desktop.Action.BROWSE))
+            return false;
+
+        try {
+            desktop.browse(url.toURI());
+            return true;
+        } catch (IOException | RuntimeException | URISyntaxException e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 
     public static void printHeader() {

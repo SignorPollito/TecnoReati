@@ -1,11 +1,11 @@
 package it.signorpollito.commands.impl;
 
 import it.signorpollito.commands.Command;
-import it.signorpollito.repository.CommandHistory;
-import it.signorpollito.service.ServiciesManager;
 import it.signorpollito.crime.Crime;
 import it.signorpollito.crime.CrimeCalculator;
+import it.signorpollito.repository.CommandHistory;
 import it.signorpollito.repository.CrimeRepository;
+import it.signorpollito.service.ServiciesManager;
 import it.signorpollito.utils.InputUtils;
 import it.signorpollito.utils.Utils;
 import lombok.SneakyThrows;
@@ -45,6 +45,7 @@ public class CrimeCommand implements Command {
         System.out.println();
         System.out.println(arrestDeclare);
 
+        System.out.println("Rimuovere dai ricercati!");
         commandHistory.addHistory(new CommandHistory.Group(crimeCalculator.getName(), commands, arrestDeclare));
 
         System.in.read(); //Wait for user input

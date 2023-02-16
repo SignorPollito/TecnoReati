@@ -4,12 +4,12 @@ import it.signorpollito.commands.CommandService;
 import it.signorpollito.commands.impl.CrimeCommand;
 import it.signorpollito.commands.impl.HistoryCommand;
 import it.signorpollito.commands.impl.PreventiveCommand;
-import it.signorpollito.repository.CommandHistory;
-import it.signorpollito.service.ServiciesManager;
+import it.signorpollito.commands.impl.WebCommand;
 import it.signorpollito.crime.Crime;
 import it.signorpollito.crime.injectors.*;
 import it.signorpollito.reader.CSVReader;
 import it.signorpollito.repository.CrimeRepository;
+import it.signorpollito.service.ServiciesManager;
 import lombok.SneakyThrows;
 
 import java.io.File;
@@ -59,6 +59,7 @@ public class BasicStartup {
         commandService.registerCommand(new CrimeCommand());
         commandService.registerCommand(new PreventiveCommand());
         commandService.registerCommand(new HistoryCommand());
+        commandService.registerCommand(new WebCommand());
     }
 
     private void updateCrimeList() {
@@ -90,6 +91,7 @@ public class BasicStartup {
     private void registerHardcodedCrimes() {
         crimeRepository.registerCrime(new Crime("Art. 27 CC", 0, 0, 3500));
         crimeRepository.registerCrime(new Crime("Guida senza casco", 0, 0, 500));
+        crimeRepository.registerCrime(new Crime("Mancato fermo al controllo/blocco stradale", 0, 0, 1000));
 
         crimeRepository.removeCrime("Mancato scontrino ( Evasione Fiscale )");
         crimeRepository.removeCrime("Scontrino con importo minore (Evasione Fiscale)");
