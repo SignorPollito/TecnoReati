@@ -51,13 +51,18 @@ public class CrimeCommand implements Command {
     }
 
     private void askCrimes(Scanner scanner, CrimeCalculator crimeCalculator) {
+        boolean crimeNotFound = false;
+
         while (true) {
             Utils.clearConsole();
             Utils.printHeader();
 
             printCrimes(crimeCalculator, crimeCalculator.getName());
 
-            String input = InputUtils.requestString(scanner, "\nInserire nome reato: (y per confermare) ");
+            if(crimeNotFound) System.out.println("> Reato non trovato! <");
+            crimeNotFound = false;
+
+            String input = InputUtils.requestString(scanner, "Inserire nome reato: (y per confermare) ");
 
             if (input.startsWith("y"))
                 break;
@@ -75,7 +80,7 @@ public class CrimeCommand implements Command {
             Crime crime = parseCrimeInput(scanner, input);
 
             if (crime == null) {
-                System.out.println("\nReato non trovato!");
+                crimeNotFound = true;
                 continue;
             }
 
@@ -109,6 +114,6 @@ public class CrimeCommand implements Command {
         for(var crime : crimeCalculator.getCrimes())
             System.out.printf("%d) %s\n", count++, crime.getName());
 
-        System.out.println("Per rimuovere reato inviare \"--rem <numero>\"");
+        System.out.println("Per rimuovere reato inviare \"--rem <numero>\"\n");
     }
 }
