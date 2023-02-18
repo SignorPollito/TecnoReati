@@ -45,7 +45,6 @@ public class CrimeCommand implements Command {
         System.out.println();
         System.out.println(arrestDeclare);
 
-        System.out.println("Rimuovere dai ricercati!");
         commandHistory.addHistory(new CommandHistory.Group(crimeCalculator.getName(), commands, arrestDeclare));
 
         System.in.read(); //Wait for user input

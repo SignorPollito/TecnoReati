@@ -1,5 +1,6 @@
 package it.signorpollito.crime.injectors;
 
+import it.signorpollito.crime.Crime;
 import it.signorpollito.utils.InputUtils;
 
 import java.util.Scanner;
@@ -13,13 +14,13 @@ public class DefamationInjector implements Injector {
     }
 
     @Override
-    public String getModifiedDisplayName(String name) {
+    public String getModifiedDisplayName(String name, Crime.Type crimeType) {
         return defamation ? name.concat(" a P.U.") : name;
     }
 
     @Override
-    public String getArrestCommandName(String name) {
-        return getModifiedDisplayName(name);
+    public String getCommandName(String name, Crime.Type crimeType) {
+        return getModifiedDisplayName(name, crimeType);
     }
 
     @Override

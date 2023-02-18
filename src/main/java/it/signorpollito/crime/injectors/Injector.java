@@ -1,16 +1,18 @@
 package it.signorpollito.crime.injectors;
 
+import it.signorpollito.crime.Crime;
+
 import java.util.Scanner;
 
 public interface Injector {
 
     default void askQuestions(Scanner scanner) {}
 
-    default String getModifiedDisplayName(String name) {
+    default String getModifiedDisplayName(String name, Crime.Type crimeType) {
         return name;
     }
 
-    default String getArrestCommandName(String name) {
+    default String getCommandName(String name, Crime.Type crimeType) {
         return name;
     }
 

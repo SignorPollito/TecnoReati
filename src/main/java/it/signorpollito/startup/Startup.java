@@ -19,20 +19,20 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 
-public class BasicStartup {
+public class Startup {
 
     private static boolean started = false;
 
-    public static BasicStartup start() {
+    public static Startup start() {
         if(started) throw new IllegalStateException("The program has already started!");
 
         started = true;
-        return new BasicStartup();
+        return new Startup();
     }
 
     private final CrimeRepository crimeRepository;
 
-    private BasicStartup() {
+    private Startup() {
         this.crimeRepository = ServiciesManager.getInstance().getCrimeRepository();
 
         startApplication();
@@ -45,8 +45,7 @@ public class BasicStartup {
 
         System.out.println("Registrando i reati nell'applicazione...");
 
-        if(!loadCrimes())
-            System.in.read();
+        if(!loadCrimes()) System.in.read();
 
         registerHardcodedCrimes();
         injectCustomizations();
@@ -89,12 +88,21 @@ public class BasicStartup {
     }
 
     private void registerHardcodedCrimes() {
+        //REMOVING
+        crimeRepository.removeCrime("Mancato scontrino ( Evasione Fiscale )");
+        crimeRepository.removeCrime("Scontrino con importo minore (Evasione Fiscale)");
+
+        crimeRepository.removeCrime("Possesso Stup Catg. 1");
+        crimeRepository.removeCrime("Possesso Stup Catg. 2");
+        crimeRepository.removeCrime("Possesso Stup Catg. 3");
+        crimeRepository.removeCrime("Possesso Stup Catg. 4");
+
+
+        //ADDING
         crimeRepository.registerCrime(new Crime("Art. 27 CC", 0, 0, 3500));
         crimeRepository.registerCrime(new Crime("Guida senza casco", 0, 0, 500));
         crimeRepository.registerCrime(new Crime("Mancato fermo al controllo/blocco stradale", 0, 0, 1000));
-
-        crimeRepository.removeCrime("Mancato scontrino ( Evasione Fiscale )");
-        crimeRepository.removeCrime("Scontrino con importo minore (Evasione Fiscale)");
+        crimeRepository.registerCrime(new Crime("Possesso di stupefacenti", 0, 0, 0));
     }
 
     private void inject(String crimeName, Class<? extends Injector> injector) {
@@ -108,10 +116,7 @@ public class BasicStartup {
     private void injectCustomizations() {
         inject("Mancato pagamento di una multa", NotPaidChargeInjector.class);
 
-        inject("Possesso Stup Catg. 1 ( Da 1 a 10 pz )", DrugInjector.class);
-        inject("Possesso Stup Catg. 2 ( Da 11 a 32 pz )", DrugInjector.class);
-        inject("Possesso Stup Catg. 3 ( Da 33 a 127pz )", DrugInjector.class);
-        inject("Possesso Stup Catg. 4 ( +128pz )", DrugInjector.class);
+        inject("Possesso di stupefacenti", DrugInjector.class);
 
         inject("Guida senza documenti", DocumentsInjector.class);
         inject("Possesso di munizioni", AmmoInjector.class);

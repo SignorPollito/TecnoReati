@@ -1,5 +1,6 @@
 package it.signorpollito.crime.injectors;
 
+import it.signorpollito.crime.Crime;
 import it.signorpollito.utils.InputUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -23,12 +24,12 @@ public class DocumentsInjector implements Injector {
     }
 
     @Override
-    public String getModifiedDisplayName(String name) {
-        return getArrestCommandName(name);
+    public String getModifiedDisplayName(String name, Crime.Type crimeType) {
+        return "Guida senza documenti";
     }
 
     @Override
-    public String getArrestCommandName(String name) {
+    public String getCommandName(String name, Crime.Type crimeType) {
         return "Guida senza documenti %s".formatted(StringUtils.joinWith(",", documents));
     }
 

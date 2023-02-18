@@ -1,14 +1,14 @@
 package it.signorpollito;
 
 import it.signorpollito.service.ServiciesManager;
-import it.signorpollito.startup.BasicStartup;
+import it.signorpollito.startup.Startup;
 import it.signorpollito.utils.Utils;
 
 public class Main {
     public static void main(String[] args) {
         Utils.printHeader();
 
-        BasicStartup.start();
+        Startup.start();
         Utils.clearConsole();
 
         while (true) {

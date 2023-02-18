@@ -73,4 +73,10 @@ public class Crime {
     public int hashCode() {
         return Objects.hash(name);
     }
+
+
+    public enum Type {
+        CHARGE,
+        ARREST
+    }
 }

@@ -1,5 +1,6 @@
 package it.signorpollito.crime.injectors;
 
+import it.signorpollito.crime.Crime;
 import it.signorpollito.utils.InputUtils;
 
 import java.util.Scanner;
@@ -13,12 +14,12 @@ public class TaxEvasionSmallerAmountInjector implements Injector {
     }
 
     @Override
-    public String getModifiedDisplayName(String name) {
+    public String getModifiedDisplayName(String name, Crime.Type crimeType) {
         return "Evasione fiscale (importo minore)";
     }
 
     @Override
-    public String getArrestCommandName(String name) {
+    public String getCommandName(String name, Crime.Type crimeType) {
         return "Evasione fiscale (importo minore)";
     }
 

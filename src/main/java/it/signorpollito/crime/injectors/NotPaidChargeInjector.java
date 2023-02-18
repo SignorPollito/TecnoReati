@@ -1,5 +1,6 @@
 package it.signorpollito.crime.injectors;
 
+import it.signorpollito.crime.Crime;
 import it.signorpollito.utils.InputUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -29,12 +30,12 @@ public class NotPaidChargeInjector implements Injector {
     }
 
     @Override
-    public String getModifiedDisplayName(String name) {
+    public String getModifiedDisplayName(String name, Crime.Type crimeType) {
         return "Mancato pagamento di ".concat(formatAmount());
     }
 
     @Override
-    public String getArrestCommandName(String name) {
+    public String getCommandName(String name, Crime.Type crimeType) {
         return "Mancato pagamento di %s %s".formatted(formatAmount(), StringUtils.joinWith(",", chargeIds));
     }
 

@@ -23,12 +23,12 @@ public class CommittedCrime {
         if(injector!=null) injector.askQuestions(scanner);
     }
 
-    public String getDisplayName() {
-        return injector==null ? crime.getName() : injector.getModifiedDisplayName(crime.getName());
+    public String getDisplayName(Crime.Type crimeType) {
+        return injector==null ? crime.getName() : injector.getModifiedDisplayName(crime.getName(), crimeType);
     }
 
-    public String getCommandName() {
-        return injector==null ? crime.getName() : injector.getArrestCommandName(crime.getName());
+    public String getCommandName(Crime.Type crimeType) {
+        return injector==null ? crime.getName() : injector.getCommandName(crime.getName(), crimeType);
     }
 
     public int getBail() {

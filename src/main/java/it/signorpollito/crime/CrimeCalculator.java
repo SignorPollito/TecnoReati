@@ -77,22 +77,21 @@ public class CrimeCalculator {
 
         for(var crime : crimes) {
             if(crime.getCharge()!=0) {
-                commands.add(generateChargeCommand(crime.getCharge(), crime.getCommandName()));
+                commands.add(generateChargeCommand(crime.getCharge(), crime.getCommandName(Crime.Type.CHARGE)));
 
-                if(crime.getHours()==0)
-                    continue;
+                if(crime.getHours()==0) continue;
             }
 
             hours += crime.getHours();
 
-            if(crimesString==null) crimesString = crime.getCommandName();
-            else crimesString = "%s, %s".formatted(crimesString, crime.getCommandName());
+            crimesString = crimesString==null ?
+                    crime.getCommandName(Crime.Type.ARREST) :
+                    "%s, %s".formatted(crimesString, crime.getCommandName(Crime.Type.ARREST));
 
             if(bail==-1) continue;
-            int crimeBail = crime.getBail();
 
-            if(crimeBail==0) bail = -1;
-            else bail += crimeBail;
+            int crimeBail = crime.getBail();
+            bail = crimeBail==0 ? -1 : bail + crimeBail;
         }
 
         if(crimesString!=null) commands.add(generateArrestCommand(hours, Math.max(0, bail), crimesString));
@@ -105,8 +104,9 @@ public class CrimeCalculator {
         for(var crime : crimes) {
             if(crime.getHours()==0) continue;
 
-            if(crimesString==null) crimesString = crime.getDisplayName();
-            else crimesString = "%s, %s".formatted(crimesString, crime.getDisplayName());
+            crimesString = crimesString==null ?
+                    crime.getDisplayName(Crime.Type.ARREST) :
+                    "%s, %s".formatted(crimesString, crime.getDisplayName(Crime.Type.ARREST));
         }
 
         return crimesString==null ? "Da non arrestare" : "La dichiaro in arresto per: ".concat(crimesString);
