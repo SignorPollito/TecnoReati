@@ -14,12 +14,12 @@ public class TaxEvasionSmallerAmountInjector implements Injector {
     }
 
     @Override
-    public String getModifiedDisplayName(String name, Crime.Type crimeType) {
+    public String getModifiedDisplayName(Crime crime, Crime.Type crimeType) {
         return "Evasione fiscale (importo minore)";
     }
 
     @Override
-    public String getCommandName(String name, Crime.Type crimeType) {
+    public String getCommandName(Crime crime, Crime.Type crimeType) {
         return "Evasione fiscale (importo minore)";
     }
 

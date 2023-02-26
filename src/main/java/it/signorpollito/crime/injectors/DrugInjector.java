@@ -47,15 +47,15 @@ public class DrugInjector implements Injector {
     }
 
     @Override
-    public String getModifiedDisplayName(String name, Crime.Type crimeType) {
-        return crimeType==Crime.Type.CHARGE || drugAmount<=10 ?
+    public String getModifiedDisplayName(Crime crime, Crime.Type crimeType) {
+        return crimeType==Crime.Type.ARREST && category.isCategory(1) ?
                 "Art. 150-bis del C.P." :
                 "Possesso di stupefacenti".concat(hided ? " e Art. 150-bis del C.P." : "");
     }
 
     @Override
-    public String getCommandName(String name, Crime.Type crimeType) {
-        name = "Possesso di stupefacenti (Catg. %d) (%dpz"
+    public String getCommandName(Crime crime, Crime.Type crimeType) {
+        String name = "Possesso di stupefacenti (Catg. %d) (%dpz"
                 .concat(seedsAmount<=0 ? ")" : String.format(", %dsemi)", seedsAmount))
                 .formatted(category.category(), drugAmount);
 

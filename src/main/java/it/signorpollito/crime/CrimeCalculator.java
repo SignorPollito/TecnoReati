@@ -11,6 +11,7 @@ public class CrimeCalculator {
     private static final String[] POSSIBLE_LETTERS = { "A", "B", "C" };
     private static final String ARREST_COMMAND = "/arresto add <NOME> <TEMPO>h <CELLA> <CAUZIONE> <MOTIVO>";
     private static final String CHARGE_COMMAND = "/multa <NOME> <SOLDI> <MOTIVO>";
+    private static final int NAME_CAP = 50;
 
     private static String randomCell() {
         var random = ThreadLocalRandom.current();
@@ -25,6 +26,10 @@ public class CrimeCalculator {
     public CrimeCalculator(String name) {
         this.crimes = new ArrayList<>();
         this.name = name;
+    }
+
+    private String validateName(Crime crime, String name) {
+        return name.length()>NAME_CAP ? crime.getFormattedArticle() : name;
     }
 
     private String generateArrestCommand(int hours, int bail, String reason) {
@@ -77,16 +82,16 @@ public class CrimeCalculator {
 
         for(var crime : crimes) {
             if(crime.getCharge()!=0) {
-                commands.add(generateChargeCommand(crime.getCharge(), crime.getCommandName(Crime.Type.CHARGE)));
+                String name = validateName(crime.getCrime(), crime.getCommandName(Crime.Type.CHARGE));
+                commands.add(generateChargeCommand(crime.getCharge(), name));
 
                 if(crime.getHours()==0) continue;
             }
 
             hours += crime.getHours();
 
-            crimesString = crimesString==null ?
-                    crime.getCommandName(Crime.Type.ARREST) :
-                    "%s, %s".formatted(crimesString, crime.getCommandName(Crime.Type.ARREST));
+            String name = validateName(crime.getCrime(), crime.getCommandName(Crime.Type.ARREST));
+            crimesString = crimesString==null ? name : "%s, %s".formatted(crimesString, name);
 
             if(bail==-1) continue;
 
@@ -104,9 +109,8 @@ public class CrimeCalculator {
         for(var crime : crimes) {
             if(crime.getHours()==0) continue;
 
-            crimesString = crimesString==null ?
-                    crime.getDisplayName(Crime.Type.ARREST) :
-                    "%s, %s".formatted(crimesString, crime.getDisplayName(Crime.Type.ARREST));
+            String name = validateName(crime.getCrime(), crime.getDisplayName(Crime.Type.ARREST));
+            crimesString = crimesString==null ? name : "%s, %s".formatted(crimesString, name);
         }
 
         return crimesString==null ? "Da non arrestare" : "La dichiaro in arresto per: ".concat(crimesString);

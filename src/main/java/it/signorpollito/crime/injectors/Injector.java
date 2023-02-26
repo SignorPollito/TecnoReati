@@ -8,12 +8,12 @@ public interface Injector {
 
     default void askQuestions(Scanner scanner) {}
 
-    default String getModifiedDisplayName(String name, Crime.Type crimeType) {
-        return name;
+    default String getModifiedDisplayName(Crime crime, Crime.Type crimeType) {
+        return useArticleAsName() ? crime.getFormattedArticle() : crime.getName();
     }
 
-    default String getCommandName(String name, Crime.Type crimeType) {
-        return name;
+    default String getCommandName(Crime crime, Crime.Type crimeType) {
+        return useArticleAsName() ? crime.getFormattedArticle() : crime.getName();
     }
 
     default int getFinalHours(int hours) {
@@ -26,5 +26,9 @@ public interface Injector {
 
     default int getFinalCharge(int charge) {
         return charge;
+    }
+
+    default boolean useArticleAsName() {
+        return false;
     }
 }
