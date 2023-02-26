@@ -39,7 +39,11 @@ public class CrimeCommand implements Command {
         var commands = crimeCalculator.getCommands();
         String arrestDeclare = crimeCalculator.getArrestDeclare();
 
-        System.out.println();
+        Utils.clearConsole();
+        Utils.printHeader();
+
+        printCrimes(crimeCalculator);
+        System.out.println("\n");
         commands.forEach(System.out::println);
 
         System.out.println();
@@ -57,7 +61,8 @@ public class CrimeCommand implements Command {
             Utils.clearConsole();
             Utils.printHeader();
 
-            printCrimes(crimeCalculator, crimeCalculator.getName());
+            printCrimes(crimeCalculator);
+            System.out.println("Per rimuovere reato inviare \"--rem <numero>\"\n");
 
             if(crimeNotFound) System.out.println("> Reato non trovato! <");
             crimeNotFound = false;
@@ -91,7 +96,7 @@ public class CrimeCommand implements Command {
     private Crime parseCrimeInput(Scanner scanner, String input) {
         List<Crime> matches = new ArrayList<>();
         for(var crime : crimeRepository.getCrimes())
-            if(StringUtils.containsIgnoreCase(crime.getName(), input))
+            if(StringUtils.containsIgnoreCase(crime.getNameWithArticle(), input))
                 matches.add(crime);
 
         if(matches.size()<=1) return matches.size()==0 ? null : matches.get(0);
@@ -102,18 +107,16 @@ public class CrimeCommand implements Command {
 
         int count = 1;
         for (var match : matches)
-            System.out.printf("%d) %s%n", count++, match.getName());
+            System.out.printf("%d) %s%n", count++, match.getNameWithArticle());
 
         return matches.get(InputUtils.requestInteger(scanner, "Selezionare numero: ", 1, matches.size())-1);
     }
 
-    private void printCrimes(CrimeCalculator crimeCalculator, String criminalName) {
-        System.out.println("Reati commessi da ".concat(criminalName));
+    private void printCrimes(CrimeCalculator crimeCalculator) {
+        System.out.println("Reati commessi da ".concat(crimeCalculator.getName()));
 
         int count = 1;
         for(var crime : crimeCalculator.getCrimes())
-            System.out.printf("%d) %s\n", count++, crime.getName());
-
-        System.out.println("Per rimuovere reato inviare \"--rem <numero>\"\n");
+            System.out.printf("%d) %s\n", count++, crime.getNameWithArticle());
     }
 }

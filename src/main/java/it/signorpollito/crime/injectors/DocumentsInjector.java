@@ -24,12 +24,12 @@ public class DocumentsInjector implements Injector {
     }
 
     @Override
-    public String getModifiedDisplayName(String name, Crime.Type crimeType) {
+    public String getModifiedDisplayName(Crime crime, Crime.Type crimeType) {
         return "Guida senza documenti";
     }
 
     @Override
-    public String getCommandName(String name, Crime.Type crimeType) {
+    public String getCommandName(Crime crime, Crime.Type crimeType) {
         return "Guida senza documenti %s".formatted(StringUtils.joinWith(",", documents));
     }
 

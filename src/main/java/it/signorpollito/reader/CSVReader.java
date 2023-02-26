@@ -8,9 +8,7 @@ import org.apache.commons.csv.CSVRecord;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public class CSVReader {
 
@@ -22,7 +20,7 @@ public class CSVReader {
 
     private int parseInt(String number) {
         try {
-            return Integer.parseInt(number);
+            return Integer.parseInt(number.split(",")[0]);
         } catch (NumberFormatException ignored) {
             return 0;
         }
@@ -32,31 +30,33 @@ public class CSVReader {
         if(field.isBlank()) return 0;
 
         field = field.split(" ")[0];
-        int multiplier = field.endsWith("d") ? 24 : 1;
-
-        return parseInt(field.substring(0, field.length()-1).strip()) * multiplier;
+        return parseInt(field.substring(0, field.length()-1).strip());
     }
 
     private int parseMoney(String field) {
-        return parseInt(field.split(" ")[0].replaceAll("[.|+|€]", "").strip());
+        return parseInt(field.replaceAll("[.|+|€]", "").strip().split(" ")[0]);
     }
 
     public Collection<Crime> getCrimes() {
-        List<Crime> crimes = new ArrayList<>();
+        Set<Crime> crimes = new HashSet<>();
 
         try(CSVParser parser = CSVParser.parse(file, StandardCharsets.UTF_8, CSVFormat.DEFAULT)) {
 
+            boolean firstLine = true;
             for(CSVRecord record : parser) {
-                long length = record.getRecordNumber();
+                if (firstLine) {
+                    firstLine = false;
+                    continue;
+                }
 
-                try {
-                    crimes.add(new Crime(record.get(1),
-                            length < 1 ? 0 : parseHours(record.get(2)),
-                            length < 2 ? 0 : parseMoney(record.get(3)),
-                            length < 3 ? 0 : parseMoney(record.get(4))
-                    ));
+                if (record.size() < 5) continue;
 
-                } catch (ArrayIndexOutOfBoundsException ignored) {}
+                crimes.add(new Crime(record.get(1).split("\\(")[0].strip(),
+                        record.get(5), record.get(6),
+                        parseHours(record.get(3)),
+                        parseMoney(record.get(4)),
+                        parseMoney(record.get(2))
+                ));
             }
 
         } catch (IOException e) {

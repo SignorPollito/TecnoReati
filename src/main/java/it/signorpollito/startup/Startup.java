@@ -18,34 +18,47 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.util.Map;
 
 public class Startup {
 
-    private static boolean started = false;
+    private static boolean STARTED = false;
+    private static final String DEFAULT_FOLDER = "Reati";
 
-    public static Startup start() {
-        if(started) throw new IllegalStateException("The program has already started!");
+    public static void start() {
+        if(STARTED) throw new IllegalStateException("The program has already started!");
 
-        started = true;
-        return new Startup();
+        STARTED = true;
+        new Startup();
     }
+
 
     private final CrimeRepository crimeRepository;
 
     private Startup() {
         this.crimeRepository = ServiciesManager.getInstance().getCrimeRepository();
 
-        startApplication();
+        startApplication(Map.of(
+                "Codice Civile", "https://docs.google.com/spreadsheets/d/1uzmU1XEv6RXfNO7O4Ht16Wb8Rdf1bnKqrQ4j7Ympalo/export?gid=0&format=csv",
+                "Codice Stradale", "https://docs.google.com/spreadsheets/d/1uzmU1XEv6RXfNO7O4Ht16Wb8Rdf1bnKqrQ4j7Ympalo/export?gid=640355816&format=csv",
+                "Codice Penale", "https://docs.google.com/spreadsheets/d/1uzmU1XEv6RXfNO7O4Ht16Wb8Rdf1bnKqrQ4j7Ympalo/export?gid=1698806507&format=csv"
+        ));
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @SneakyThrows
-    private void startApplication() {
+    private void startApplication(Map<String, String> codes) {
         System.out.println("Aggiornando la Lista Reati...");
-        updateCrimeList();
+
+        File crimeFolder = new File(DEFAULT_FOLDER);
+        if(!crimeFolder.exists()) crimeFolder.mkdirs();
+
+        deleteOldFiles(DEFAULT_FOLDER);
+        updateCrimeList(codes, DEFAULT_FOLDER);
 
         System.out.println("Registrando i reati nell'applicazione...");
 
-        if(!loadCrimes()) System.in.read();
+        if(!loadCrimesFromFolder(crimeFolder)) System.in.read();
 
         registerHardcodedCrimes();
         injectCustomizations();
@@ -61,48 +74,71 @@ public class Startup {
         commandService.registerCommand(new WebCommand());
     }
 
-    private void updateCrimeList() {
-        new File("ListaReati.csv").delete();
+    private File[] getFilesInFolder(File folder) {
+        if(!folder.isDirectory()) return new File[0];
 
-        try(FileOutputStream fileOutputStream = new FileOutputStream("ListaReati.csv")) {
-            ReadableByteChannel readableByteChannel = Channels.newChannel(new URL(
-                    "https://docs.google.com/spreadsheets/d/1CzQoZbGMeN9Z59ZeZU9No8actcZneGEIgevOao9zEFs/export?format=csv"
-            ).openStream());
-
-            fileOutputStream.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
-
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+        File[] contents = folder.listFiles();
+        return contents==null ? new File[0] : contents;
     }
 
-    private boolean loadCrimes() {
-        File file = new File("ListaReati.csv");
-        if(!file.exists()) {
-            System.out.println("File reati non trovato, assicurati che si chiami \"ListaReati.csv\"");
-            return false;
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private void deleteOldFiles(String path) {
+        File file = new File(path);
+        if(!file.exists()) return;
+
+        if(file.isFile()) {
+            file.delete();
+            return;
+        }
+
+        for(var content : getFilesInFolder(file))
+            content.delete();
+    }
+
+    private void updateCrimeList(Map<String, String> codes, String folderPath) {
+        codes.forEach((name, url) -> {
+            try(FileOutputStream fileOutputStream = new FileOutputStream("%s/ListaReati - %s.csv".formatted(folderPath, name))) {
+                ReadableByteChannel readableByteChannel = Channels.newChannel(new URL(url).openStream());
+
+                fileOutputStream.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
+
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        });
+    }
+
+    private void loadCrimesFromFile(File file) {
+        if(!file.exists() || !file.isFile()) {
+            System.out.printf("File reati non trovato, assicurati che si chiami \"%s\"\n", file.getName());
+            return;
         }
 
         new CSVReader(file).getCrimes().forEach(crimeRepository::registerCrime);
+    }
+
+    private boolean loadCrimesFromFolder(File folder) {
+        if(!folder.exists() || !folder.isDirectory()) {
+            System.out.printf("Cartella reati non trovata, assicurati che si chiami \"%s\"\n", folder.getName());
+            return false;
+        }
+
+        for(var file : getFilesInFolder(folder))
+            loadCrimesFromFile(file);
+
         return true;
     }
 
     private void registerHardcodedCrimes() {
         //REMOVING
-        crimeRepository.removeCrime("Mancato scontrino ( Evasione Fiscale )");
-        crimeRepository.removeCrime("Scontrino con importo minore (Evasione Fiscale)");
+        crimeRepository.removeCrime("stupefacenti o psicotrope");
 
-        crimeRepository.removeCrime("Possesso Stup Catg. 1");
-        crimeRepository.removeCrime("Possesso Stup Catg. 2");
-        crimeRepository.removeCrime("Possesso Stup Catg. 3");
-        crimeRepository.removeCrime("Possesso Stup Catg. 4");
-
+        //DUPLICATING
+        duplicateCrime("Obblighi verso funzionari, ufficiali e agenti", "Mancato fermo al controllo/blocco stradale");
+        duplicateCrime("Obblighi verso funzionari, ufficiali e agenti", "Proseguimento della guida senza documenti");
 
         //ADDING
-        crimeRepository.registerCrime(new Crime("Art. 27 CC", 0, 0, 3500));
-        crimeRepository.registerCrime(new Crime("Guida senza casco", 0, 0, 500));
-        crimeRepository.registerCrime(new Crime("Mancato fermo al controllo/blocco stradale", 0, 0, 1000));
-        crimeRepository.registerCrime(new Crime("Possesso di stupefacenti", 0, 0, 0));
+        crimeRepository.registerCrime(new Crime("Possesso di stupefacenti", "Art. 150", "CP", 0, 0, 0));
     }
 
     private void inject(String crimeName, Class<? extends Injector> injector) {
@@ -113,24 +149,35 @@ public class Startup {
         crimeRepository.editCrime(crimeName, crime -> crime.setName(newName));
     }
 
+    private void duplicateCrime(String crimeName, String newName) {
+        crimeRepository.editCrime(crimeName, crime -> new Crime(newName, crime.getArticle(), crime.getCode(), crime.getHours(), crime.getBail(), crime.getCharge()));
+    }
+
     private void injectCustomizations() {
-        inject("Mancato pagamento di una multa", NotPaidChargeInjector.class);
+        inject("Mancato pagamento di multe", NotPaidChargeInjector.class);
 
         inject("Possesso di stupefacenti", DrugInjector.class);
 
-        inject("Guida senza documenti", DocumentsInjector.class);
+        inject("Organizzazione di competizioni non autorizzate in velocità", CompetitionInjector.class);
+        inject("Obblighi verso funzionari, ufficiali e agenti", AgentObligationsInjector.class);
+        inject("Guida senza Documenti", DocumentsInjector.class);
         inject("Possesso di munizioni", AmmoInjector.class);
 
         inject("Evasione", EvasionInjector.class);
 
-        inject("Atti osceni in pubblico", SexInjector.class);
+        inject("Atti osceni", SexInjector.class);
         inject("Frode nell'esercizio del commercio", ScamInjector.class);
-        inject("Diffamazione", DefamationInjector.class);
 
-        inject("Evasione fiscale ( mancato scontrino )", TaxEvasionNoReceiptInjector.class);
-        inject("Evasione fiscale ( scontrino con importo minore )", TaxEvasionSmallerAmountInjector.class);
+        inject("Evasione fiscale per mancato scontrino", TaxEvasionNoReceiptInjector.class);
+        inject("Evasione fiscale per scontrino con Importo Minore", TaxEvasionSmallerAmountInjector.class);
 
-        setCustomName("Mancata registrazione di un Plot", "Art. 28 CC");
-        setCustomName("Mancata cassetta postale", "Art. 29 CC");
+        inject("Associazione per delinquere", CrimeAssociationInjector.class);
+        inject("Associazione di tipo mafioso", CrimeAssociationInjector.class);
+        inject("Associazioni sovversive", SubversiveAssociationInjector.class);
+        inject("Atto di terrorismo con ordigni micidiali o esplosivi", TerrorismInjector.class);
+
+        inject("Mancato possesso di una Cassetta Postale", ArticleInjector.class);
+        inject("Mancata registrazione di un lotto", ArticleInjector.class);
+        inject("Regola del Buon Vicinato", ArticleInjector.class);
     }
 }

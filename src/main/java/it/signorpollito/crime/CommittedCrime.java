@@ -6,7 +6,6 @@ import lombok.Getter;
 import java.util.Scanner;
 
 public class CommittedCrime {
-
     @Getter private final Crime crime;
     private final Injector injector;
 
@@ -24,11 +23,11 @@ public class CommittedCrime {
     }
 
     public String getDisplayName(Crime.Type crimeType) {
-        return injector==null ? crime.getName() : injector.getModifiedDisplayName(crime.getName(), crimeType);
+        return injector==null ? crime.getName() : injector.getModifiedDisplayName(crime, crimeType);
     }
 
     public String getCommandName(Crime.Type crimeType) {
-        return injector==null ? crime.getName() : injector.getCommandName(crime.getName(), crimeType);
+        return injector==null ? crime.getName() : injector.getCommandName(crime, crimeType);
     }
 
     public int getBail() {
