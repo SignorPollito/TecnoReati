@@ -51,7 +51,7 @@ public final class Utils {
     }
 
     public static void printHeader() {
-        System.out.println("TecnoReati v1.0 - by SMD for SMD");
+        System.out.println("TecnoReati v2.0.0 - by SMD for SMD");
         System.out.println("Made with love by SignorPollito - @SirPollito\n");
     }
 }
