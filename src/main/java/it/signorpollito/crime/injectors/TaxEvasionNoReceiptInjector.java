@@ -14,16 +14,6 @@ public class TaxEvasionNoReceiptInjector implements Injector {
     }
 
     @Override
-    public String getModifiedDisplayName(Crime crime, Crime.Type crimeType) {
-        return "Evasione fiscale (mancato scontrino)";
-    }
-
-    @Override
-    public String getCommandName(Crime crime, Crime.Type crimeType) {
-        return "Evasione fiscale (mancato scontrino)";
-    }
-
-    @Override
     public int getFinalCharge(int charge) {
         return evadedAmount;
     }

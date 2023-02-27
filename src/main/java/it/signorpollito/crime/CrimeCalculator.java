@@ -11,7 +11,9 @@ public class CrimeCalculator {
     private static final String[] POSSIBLE_LETTERS = { "A", "B", "C" };
     private static final String ARREST_COMMAND = "/arresto add <NOME> <TEMPO>h <CELLA> <CAUZIONE> <MOTIVO>";
     private static final String CHARGE_COMMAND = "/multa <NOME> <SOLDI> <MOTIVO>";
+
     private static final int NAME_CAP = 50;
+    private static final int TOTAL_NAME_CAP = 256;
 
     private static String randomCell() {
         var random = ThreadLocalRandom.current();
@@ -28,11 +30,7 @@ public class CrimeCalculator {
         this.name = name;
     }
 
-    private String validateName(Crime crime, String name) {
-        return name.length()>NAME_CAP ? crime.getFormattedArticle() : name;
-    }
-
-    private String generateArrestCommand(int hours, int bail, String reason) {
+    private String formattedArrestCommand(int hours, int bail, String reason) {
         return ARREST_COMMAND.replace("<NOME>", name)
                 .replace("<TEMPO>", String.valueOf(hours))
                 .replace("<CELLA>", randomCell())
@@ -40,7 +38,7 @@ public class CrimeCalculator {
                 .replace("<MOTIVO>", reason);
     }
 
-    private String generateChargeCommand(int money, String reason) {
+    private String formattedChargeCommand(int money, String reason) {
         return CHARGE_COMMAND.replace("<NOME>", name)
                 .replace("<SOLDI>", String.valueOf(money))
                 .replace("<MOTIVO>", reason);
@@ -51,7 +49,7 @@ public class CrimeCalculator {
     }
 
     public void removeCrime(String crimeName) {
-        this.crimes.removeIf(crime -> crime.isCrime(crimeName));
+        this.crimes.removeIf(crime -> crime.getCrime().isCrime(crimeName));
     }
 
     public boolean removeCrime(int index) {
@@ -60,8 +58,8 @@ public class CrimeCalculator {
 
     public void completeQuestions(Scanner scanner) {
         crimes.forEach(crime -> {
-            System.out.println();
             crime.askQuestions(scanner);
+            System.out.println();
         });
     }
 
@@ -73,24 +71,45 @@ public class CrimeCalculator {
         return crimes.size();
     }
 
+    public String getArrestDeclare(boolean compacted) {
+        String crimesString = null;
+
+        for(var crime : crimes) {
+            if(crime.getHours()==0) continue;
+
+            String name = compacted ?
+                    crime.getArticleForName(Crime.Type.ARREST) :
+                    crime.getDisplayName(Crime.Type.ARREST, NAME_CAP);
+
+            crimesString = crimesString==null ? name : "%s, %s".formatted(crimesString, name);
+        }
+
+        if(crimesString==null) return "Da non arrestare";
+
+        String delaration = "La dichiaro in arresto per: ".concat(crimesString);
+        return delaration.length()>TOTAL_NAME_CAP ? getArrestDeclare(true) : delaration;
+    }
+
     public List<String> getCommands() {
         List<String> commands = new ArrayList<>();
         String crimesString = null;
 
         int hours = 0;
         int bail = 0;
+        int temp;
 
         for(var crime : crimes) {
-            if(crime.getCharge()!=0) {
-                String name = validateName(crime.getCrime(), crime.getCommandName(Crime.Type.CHARGE));
-                commands.add(generateChargeCommand(crime.getCharge(), name));
+            temp = crime.getHours();
 
-                if(crime.getHours()==0) continue;
+            if(crime.getCharge()!=0) {
+                commands.add(formattedChargeCommand(crime.getCharge(), crime.getCommandName(Crime.Type.CHARGE, NAME_CAP)));
+
+                if(temp==0) continue;
             }
 
-            hours += crime.getHours();
+            hours += temp;
 
-            String name = validateName(crime.getCrime(), crime.getCommandName(Crime.Type.ARREST));
+            String name = crime.getArticleForCommand(Crime.Type.ARREST);
             crimesString = crimesString==null ? name : "%s, %s".formatted(crimesString, name);
 
             if(bail==-1) continue;
@@ -99,20 +118,7 @@ public class CrimeCalculator {
             bail = crimeBail==0 ? -1 : bail + crimeBail;
         }
 
-        if(crimesString!=null) commands.add(generateArrestCommand(hours, Math.max(0, bail), crimesString));
+        if(crimesString!=null) commands.add(formattedArrestCommand(hours, Math.max(0, bail), crimesString));
         return commands;
-    }
-
-    public String getArrestDeclare() {
-        String crimesString = null;
-
-        for(var crime : crimes) {
-            if(crime.getHours()==0) continue;
-
-            String name = validateName(crime.getCrime(), crime.getDisplayName(Crime.Type.ARREST));
-            crimesString = crimesString==null ? name : "%s, %s".formatted(crimesString, name);
-        }
-
-        return crimesString==null ? "Da non arrestare" : "La dichiaro in arresto per: ".concat(crimesString);
     }
 }

@@ -22,7 +22,7 @@ public class CSVReader {
         try {
             return Integer.parseInt(number.split(",")[0]);
         } catch (NumberFormatException ignored) {
-            return 0;
+            return -1;
         }
     }
 

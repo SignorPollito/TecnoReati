@@ -14,20 +14,45 @@ public class CommittedCrime {
         this.injector = injector;
     }
 
-    public boolean isCrime(String crimeName) {
-        return crime.getName().equalsIgnoreCase(crimeName);
+    /**
+     * Checks if the provided string goes over the cap.
+     * If true, the formatted article about this crime will be returned,
+     * otherwise will return the original string.
+     *
+     * @param string The string to check
+     * @param cap The cap greather than the string must not go over
+     * @return The original string or the formatted article if it's too long
+     */
+    private String checkCap(String string, int cap) {
+        return string.length()>cap ? crime.getFormattedArticle() : string;
     }
 
     public void askQuestions(Scanner scanner) {
         if(injector!=null) injector.askQuestions(scanner);
     }
 
+    public String getArticleForName(Crime.Type crimeType) {
+        return injector==null ? crime.getFormattedArticle() : injector.modifyName(crime, crimeType);
+    }
+
+    public String getArticleForCommand(Crime.Type crimeType) {
+        return injector==null ? crime.getFormattedArticle() : injector.modifyCommand(crime, crimeType);
+    }
+
     public String getDisplayName(Crime.Type crimeType) {
-        return injector==null ? crime.getName() : injector.getModifiedDisplayName(crime, crimeType);
+        return injector==null ? crime.getName() : injector.modifyName(crime, crimeType);
+    }
+
+    public String getDisplayName(Crime.Type crimeType, int cap) {
+        return checkCap(getDisplayName(crimeType), cap);
     }
 
     public String getCommandName(Crime.Type crimeType) {
-        return injector==null ? crime.getName() : injector.getCommandName(crime, crimeType);
+        return injector==null ? crime.getName() : injector.modifyCommand(crime, crimeType);
+    }
+
+    public String getCommandName(Crime.Type crimeType, int cap) {
+        return checkCap(getCommandName(crimeType), cap);
     }
 
     public int getBail() {

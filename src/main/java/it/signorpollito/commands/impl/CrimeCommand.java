@@ -37,7 +37,7 @@ public class CrimeCommand implements Command {
         crimeCalculator.completeQuestions(scanner);
 
         var commands = crimeCalculator.getCommands();
-        String arrestDeclare = crimeCalculator.getArrestDeclare();
+        String arrestDeclare = crimeCalculator.getArrestDeclare(false);
 
         Utils.clearConsole();
         Utils.printHeader();
@@ -96,7 +96,7 @@ public class CrimeCommand implements Command {
     private Crime parseCrimeInput(Scanner scanner, String input) {
         List<Crime> matches = new ArrayList<>();
         for(var crime : crimeRepository.getCrimes())
-            if(StringUtils.containsIgnoreCase(crime.getNameWithArticle(), input))
+            if(StringUtils.containsIgnoreCase(crime.getFullName(), input))
                 matches.add(crime);
 
         if(matches.size()<=1) return matches.size()==0 ? null : matches.get(0);
@@ -107,7 +107,7 @@ public class CrimeCommand implements Command {
 
         int count = 1;
         for (var match : matches)
-            System.out.printf("%d) %s%n", count++, match.getNameWithArticle());
+            System.out.printf("%d) %s%n", count++, match.getFullName());
 
         return matches.get(InputUtils.requestInteger(scanner, "Selezionare numero: ", 1, matches.size())-1);
     }
@@ -117,6 +117,6 @@ public class CrimeCommand implements Command {
 
         int count = 1;
         for(var crime : crimeCalculator.getCrimes())
-            System.out.printf("%d) %s\n", count++, crime.getNameWithArticle());
+            System.out.printf("%d) %s\n", count++, crime.getFullName());
     }
 }

@@ -5,12 +5,12 @@ import it.signorpollito.crime.Crime;
 public class ArticleInjector implements Injector {
 
     @Override
-    public String getModifiedDisplayName(Crime crime, Crime.Type crimeType) {
+    public String modifyName(Crime crime, Crime.Type crimeType) {
         return crime.getFormattedArticle();
     }
 
     @Override
-    public String getCommandName(Crime crime, Crime.Type crimeType) {
+    public String modifyCommand(Crime crime, Crime.Type crimeType) {
         return crime.getFormattedArticle();
     }
 }

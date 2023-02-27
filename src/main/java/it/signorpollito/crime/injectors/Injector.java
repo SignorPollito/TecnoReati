@@ -8,11 +8,11 @@ public interface Injector {
 
     default void askQuestions(Scanner scanner) {}
 
-    default String getModifiedDisplayName(Crime crime, Crime.Type crimeType) {
+    default String modifyName(Crime crime, Crime.Type crimeType) {
         return useArticleAsName() ? crime.getFormattedArticle() : crime.getName();
     }
 
-    default String getCommandName(Crime crime, Crime.Type crimeType) {
+    default String modifyCommand(Crime crime, Crime.Type crimeType) {
         return useArticleAsName() ? crime.getFormattedArticle() : crime.getName();
     }
 

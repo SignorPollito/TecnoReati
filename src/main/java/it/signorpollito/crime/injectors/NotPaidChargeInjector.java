@@ -30,13 +30,15 @@ public class NotPaidChargeInjector implements Injector {
     }
 
     @Override
-    public String getModifiedDisplayName(Crime crime, Crime.Type crimeType) {
+    public String modifyName(Crime crime, Crime.Type crimeType) {
         return "Mancato pagamento di ".concat(formatAmount());
     }
 
     @Override
-    public String getCommandName(Crime crime, Crime.Type crimeType) {
-        return "Mancato pagamento di %s %s".formatted(formatAmount(), StringUtils.joinWith(",", chargeIds));
+    public String modifyCommand(Crime crime, Crime.Type crimeType) {
+        return crime.getFormattedArticle()
+                .concat(" x%d %s")
+                .formatted(chargesAmount, StringUtils.joinWith(",", chargeIds));
     }
 
     @Override

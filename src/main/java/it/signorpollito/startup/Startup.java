@@ -145,10 +145,6 @@ public class Startup {
         crimeRepository.editCrime(crimeName, crime -> crime.setInjectorClass(injector));
     }
 
-    private void setCustomName(String crimeName, String newName) {
-        crimeRepository.editCrime(crimeName, crime -> crime.setName(newName));
-    }
-
     private void duplicateCrime(String crimeName, String newName) {
         crimeRepository.editCrime(crimeName, crime -> new Crime(newName, crime.getArticle(), crime.getCode(), crime.getHours(), crime.getBail(), crime.getCharge()));
     }
