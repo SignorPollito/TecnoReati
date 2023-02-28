@@ -16,7 +16,7 @@ public class Crime {
     @Getter private final int bail;
     @Getter private final int charge;
 
-    private Class<? extends Injector> injectorClass;
+    protected Class<? extends Injector> injectorClass;
 
     public Crime(String name, String article, String code, int hours, int bail, int charge) {
         this.name = name;
@@ -29,7 +29,7 @@ public class Crime {
         this.charge = Math.max(0, charge);
     }
 
-    private Injector createInjector() {
+    protected Injector createInjector(Class<? extends Injector> injectorClass) {
         if(injectorClass==null) return null;
 
         try {
@@ -115,7 +115,7 @@ public class Crime {
      * @return The committed crime
      */
     public CommittedCrime commitCrime() {
-        return new CommittedCrime(this, createInjector());
+        return new CommittedCrime(this, createInjector(injectorClass));
     }
 
     @Override

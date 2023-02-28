@@ -12,7 +12,7 @@ public class DocumentsInjector implements Injector {
     private final List<String> documents = new ArrayList<>();
 
     @Override
-    public void askQuestions(Scanner scanner) {
+    public void askQuestions(Scanner scanner, Crime crime) {
         if(!InputUtils.requestYes(scanner, "Ha il libretto? (y/n) "))
             documents.add("libretto");
 
@@ -35,6 +35,6 @@ public class DocumentsInjector implements Injector {
 
     @Override
     public int getFinalCharge(int charge) {
-        return 500 * documents.size();
+        return charge * documents.size();
     }
 }

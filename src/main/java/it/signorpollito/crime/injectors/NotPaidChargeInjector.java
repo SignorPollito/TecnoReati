@@ -18,7 +18,7 @@ public class NotPaidChargeInjector implements Injector {
     }
 
     @Override
-    public void askQuestions(Scanner scanner) {
+    public void askQuestions(Scanner scanner, Crime crime) {
         chargesAmount = InputUtils.requestInteger(scanner, "Quante multe non pagate? ", 1, 15);
 
         for (int i = 1; i <= chargesAmount; i++) {

@@ -6,6 +6,7 @@ import it.signorpollito.utils.Utils;
 
 public class Main {
     public static void main(String[] args) {
+        Utils.clearConsole();
         Utils.printHeader();
 
         Startup.start();

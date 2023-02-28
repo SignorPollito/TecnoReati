@@ -9,8 +9,13 @@ public class TaxEvasionNoReceiptInjector implements Injector {
     private int evadedAmount = 0;
 
     @Override
-    public void askQuestions(Scanner scanner) {
+    public void askQuestions(Scanner scanner, Crime crime) {
         evadedAmount = InputUtils.requestInteger(scanner, "Quanto ha evaso? (Per mancato scontrino) ", 0);
+    }
+
+    @Override
+    public int getFinalHours(int hours) {
+        return 0;
     }
 
     @Override

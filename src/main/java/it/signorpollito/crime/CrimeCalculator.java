@@ -58,8 +58,8 @@ public class CrimeCalculator {
 
     public void completeQuestions(Scanner scanner) {
         crimes.forEach(crime -> {
-            crime.askQuestions(scanner);
             System.out.println();
+            crime.askQuestions(scanner);
         });
     }
 

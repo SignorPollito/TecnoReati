@@ -1,7 +1,6 @@
 package it.signorpollito.repository;
 
 import it.signorpollito.crime.Crime;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,20 +16,32 @@ public class CrimeRepository {
         this.crimes = new ArrayList<>();
     }
 
-    private boolean matchNames(String completeName, String partial) {
-        return StringUtils.containsIgnoreCase(completeName, partial);
-    }
-
     public boolean registerCrime(Crime crime) {
         return crimes.add(crime);
     }
 
-    public Crime getCrime(String name) {
+    public Crime getCrimePrecise(String name) {
         for(var crime : crimes)
-            if(matchNames(crime.getName(), name))
+            if(crime.isCrime(name))
                 return crime;
 
         return null;
+    }
+
+    public Crime getCrime(String name) {
+        for(var crime : crimes)
+            if(crime.match(name))
+                return crime;
+
+        return null;
+    }
+
+    public boolean editCrimePrecise(String name, Consumer<Crime> editor) {
+        Crime crime = getCrimePrecise(name);
+        if(crime==null) return false;
+
+        editor.accept(crime);
+        return true;
     }
 
     public boolean editCrime(String name, Consumer<Crime> editor) {
@@ -41,8 +52,12 @@ public class CrimeRepository {
         return true;
     }
 
+    public boolean removeCrimePrecice(String name) {
+        return crimes.removeIf(crime -> crime.isCrime(name));
+    }
+
     public boolean removeCrime(String name) {
-        return crimes.removeIf(crime -> matchNames(crime.getName(), name));
+        return crimes.removeIf(crime -> crime.match(name));
     }
 
     public Collection<Crime> getCrimes() {

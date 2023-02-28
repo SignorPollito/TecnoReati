@@ -132,6 +132,8 @@ public class Startup {
     private void registerHardcodedCrimes() {
         //REMOVING
         crimeRepository.removeCrime("stupefacenti o psicotrope");
+        crimeRepository.removeCrimePrecice("Evasione");
+        crimeRepository.removeCrimePrecice("Evasione (si costituisce)");
 
         //DUPLICATING
         duplicateCrime("Obblighi verso funzionari, ufficiali e agenti", "Mancato fermo al controllo/blocco stradale");
@@ -139,10 +141,15 @@ public class Startup {
 
         //ADDING
         crimeRepository.registerCrime(new Crime("Possesso di stupefacenti", "Art. 150", "CP", 0, 0, 0));
+        crimeRepository.registerCrime(new Crime("Evasione", "Art. 93", "CP", 0, 0, 0));
     }
 
     private void inject(String crimeName, Class<? extends Injector> injector) {
         crimeRepository.editCrime(crimeName, crime -> crime.setInjectorClass(injector));
+    }
+
+    private void injectPrecise(String crimeName, Class<? extends Injector> injector) {
+        crimeRepository.editCrimePrecise(crimeName, crime -> crime.setInjectorClass(injector));
     }
 
     private void duplicateCrime(String crimeName, String newName) {
@@ -154,23 +161,16 @@ public class Startup {
 
         inject("Possesso di stupefacenti", DrugInjector.class);
 
-        inject("Organizzazione di competizioni non autorizzate in velocità", CompetitionInjector.class);
-        inject("Obblighi verso funzionari, ufficiali e agenti", AgentObligationsInjector.class);
         inject("Guida senza Documenti", DocumentsInjector.class);
         inject("Possesso di munizioni", AmmoInjector.class);
 
-        inject("Evasione", EvasionInjector.class);
+        injectPrecise("Evasione", EvasionInjector.class);
 
         inject("Atti osceni", SexInjector.class);
         inject("Frode nell'esercizio del commercio", ScamInjector.class);
 
         inject("Evasione fiscale per mancato scontrino", TaxEvasionNoReceiptInjector.class);
         inject("Evasione fiscale per scontrino con Importo Minore", TaxEvasionSmallerAmountInjector.class);
-
-        inject("Associazione per delinquere", CrimeAssociationInjector.class);
-        inject("Associazione di tipo mafioso", CrimeAssociationInjector.class);
-        inject("Associazioni sovversive", SubversiveAssociationInjector.class);
-        inject("Atto di terrorismo con ordigni micidiali o esplosivi", TerrorismInjector.class);
 
         inject("Mancato possesso di una Cassetta Postale", ArticleInjector.class);
         inject("Mancata registrazione di un lotto", ArticleInjector.class);

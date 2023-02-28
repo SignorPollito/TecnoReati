@@ -28,7 +28,7 @@ public class CommittedCrime {
     }
 
     public void askQuestions(Scanner scanner) {
-        if(injector!=null) injector.askQuestions(scanner);
+        if(injector!=null) injector.askQuestions(scanner, crime);
     }
 
     public String getArticleForName(Crime.Type crimeType) {

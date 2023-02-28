@@ -6,14 +6,14 @@ import java.util.Scanner;
 
 public interface Injector {
 
-    default void askQuestions(Scanner scanner) {}
+    default void askQuestions(Scanner scanner, Crime crime) {}
 
     default String modifyName(Crime crime, Crime.Type crimeType) {
-        return useArticleAsName() ? crime.getFormattedArticle() : crime.getName();
+        return crime.getName();
     }
 
     default String modifyCommand(Crime crime, Crime.Type crimeType) {
-        return useArticleAsName() ? crime.getFormattedArticle() : crime.getName();
+        return crime.getName();
     }
 
     default int getFinalHours(int hours) {
@@ -26,9 +26,5 @@ public interface Injector {
 
     default int getFinalCharge(int charge) {
         return charge;
-    }
-
-    default boolean useArticleAsName() {
-        return false;
     }
 }
