@@ -34,7 +34,7 @@ public class DrugInjector implements Injector {
     private boolean hided;
 
     @Override
-    public void askQuestions(Scanner scanner) {
+    public void askQuestions(Scanner scanner, Crime crime) {
         drugAmount = InputUtils.requestInteger(scanner, "Quanti pezzi di droga? ", 0);
         seedsAmount = InputUtils.requestInteger(scanner, "Quanti semi di droga? ", 0);
         hided = InputUtils.requestYes(scanner, "Ha occultato? (y/n) ");
