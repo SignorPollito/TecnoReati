@@ -37,8 +37,9 @@ public class NotPaidChargeInjector implements Injector {
     @Override
     public String modifyCommand(Crime crime, Crime.Type crimeType) {
         return crime.getFormattedArticle()
-                .concat(" x%d %s")
-                .formatted(chargesAmount, StringUtils.joinWith(",", chargeIds));
+                .concat(chargesAmount>1 ? " x%d".formatted(chargesAmount) : "")
+                .concat(" %s")
+                .formatted(StringUtils.joinWith(",", chargeIds));
     }
 
     @Override
