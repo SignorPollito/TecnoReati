@@ -13,7 +13,7 @@ public interface Injector {
     }
 
     default String modifyCommand(Crime crime, Crime.Type crimeType) {
-        return crime.getName();
+        return crime.getFormattedArticle();
     }
 
     default int getFinalHours(int hours) {

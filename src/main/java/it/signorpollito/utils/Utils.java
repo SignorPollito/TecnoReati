@@ -52,7 +52,7 @@ public final class Utils {
 
     public static void printHeader() {
         System.out.println("---------------------------------------------------");
-        System.out.println("|        TecnoReati v2.1.0b - by SMD for SMD       |");
+        System.out.println("|        TecnoReati v2.1.0c - by SMD for SMD       |");
         System.out.println("|  Made with love by SignorPollito - @SirPollito  |");
         System.out.println("---------------------------------------------------\n");
     }

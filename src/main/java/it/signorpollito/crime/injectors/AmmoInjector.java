@@ -14,6 +14,11 @@ public class AmmoInjector implements Injector {
     }
 
     @Override
+    public String modifyCommand(Crime crime, Crime.Type crimeType) {
+        return "%s (x%d)".formatted(crime.getFormattedArticle(), ammo);
+    }
+
+    @Override
     public int getFinalBail(int bail) {
         return bail * (ammo/5);
     }
