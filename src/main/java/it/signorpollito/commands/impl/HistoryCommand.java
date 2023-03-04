@@ -27,10 +27,19 @@ public class HistoryCommand implements Command {
         groups.sort(Comparator.comparing(CommandHistory.Group::getDate));
 
         groups.forEach(group -> {
+            var container = group.getContainer();
             System.out.printf("<-> Comandi su %s, ore %s <->\n", group.getCriminal(), group.getFormattedTime());
-            group.getCommands().forEach(System.out::println);
 
-            System.out.printf("\n%s\n\n\n", group.getDeclaration());
+            System.out.println("\n");
+            container.printCharges();
+
+            System.out.println();
+            container.printDeclare();
+
+            System.out.println();
+            container.printArrest();
+
+            System.out.print("\n\n\n");
         });
 
         System.in.read(); //Wait for user input

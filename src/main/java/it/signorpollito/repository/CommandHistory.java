@@ -1,12 +1,11 @@
 package it.signorpollito.repository;
 
+import it.signorpollito.crime.CrimesContainer;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 public class CommandHistory {
@@ -31,14 +30,12 @@ public class CommandHistory {
 
 
         @Getter private final LocalDateTime date;
-        @Getter private final Collection<String> commands;
-        @Getter private final String declaration;
+        @Getter private final CrimesContainer container;
         @Getter private final String criminal;
 
-        public Group(String criminal, Collection<String> commands, String declaration) {
-            this.commands = Collections.unmodifiableCollection(commands);
-            this.declaration = declaration;
+        public Group(String criminal, CrimesContainer container) {
             this.criminal = criminal;
+            this.container = container;
 
             date = LocalDateTime.now();
         }

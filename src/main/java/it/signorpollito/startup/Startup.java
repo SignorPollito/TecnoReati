@@ -62,6 +62,7 @@ public class Startup {
 
         registerHardcodedCrimes();
         injectCustomizations();
+        registerAliases();
 
         registerCommands();
     }
@@ -132,48 +133,54 @@ public class Startup {
     private void registerHardcodedCrimes() {
         //REMOVING
         crimeRepository.removeCrime("stupefacenti o psicotrope");
-        crimeRepository.removeCrimePrecice("Evasione");
-        crimeRepository.removeCrimePrecice("Evasione (si costituisce)");
-
-        //DUPLICATING
-        duplicateCrime("Obblighi verso funzionari, ufficiali e agenti", "Mancato fermo al controllo/blocco stradale");
-        duplicateCrime("Obblighi verso funzionari, ufficiali e agenti", "Proseguimento della guida senza documenti");
+        crimeRepository.removeCrime("Evasione", true);
+        crimeRepository.removeCrime("Evasione (si costituisce)", true);
 
         //ADDING
         crimeRepository.registerCrime(new Crime("Possesso di stupefacenti", "Art. 150", "CP", 0, 0, 0));
         crimeRepository.registerCrime(new Crime("Evasione", "Art. 93", "CP", 0, 0, 0));
     }
 
-    private void inject(String crimeName, Class<? extends Injector> injector) {
-        crimeRepository.editCrime(crimeName, crime -> crime.setInjectorClass(injector));
+    private void registerAliases() {
+        setAlias("Obblighi verso funzionari, ufficiali e agenti",
+                "Mancato fermo al controllo/blocco stradale Proseguimento della guida senza documenti", false
+        );
+
+        setAlias("Mancato pagamento di multe", "multa sanzione", false);
+        setAlias("Possesso di stupefacenti", "droga droghe stupefacente", false);
+        setAlias("Inosservanza dei provvedimenti", "cinturamento", false);
+        setAlias("Introduzione clandestina in luoghi militari", "zona militare", false);
+        setAlias("Immondizia nelle Strade", "inquinamento", false);
+        setAlias("Parcheggio in luoghi inopportuni", "luogo non opportuno inopportuno", false);
+        setAlias("Disturbo del Lavoro", "chiamate futili", false);
     }
 
-    private void injectPrecise(String crimeName, Class<? extends Injector> injector) {
-        crimeRepository.editCrimePrecise(crimeName, crime -> crime.setInjectorClass(injector));
+    private void inject(String crimeName, Class<? extends Injector> injector, boolean fullMatch) {
+        crimeRepository.editCrime(crimeName, crime -> crime.setInjectorClass(injector), fullMatch);
     }
 
-    private void duplicateCrime(String crimeName, String newName) {
-        crimeRepository.editCrime(crimeName, crime -> new Crime(newName, crime.getArticle(), crime.getCode(), crime.getHours(), crime.getBail(), crime.getCharge()));
+    private void setAlias(String crimeName, String alias, boolean fullMatch) {
+        crimeRepository.editCrime(crimeName, crime -> crime.setAlias(alias), fullMatch);
     }
 
     private void injectCustomizations() {
-        inject("Mancato pagamento di multe", NotPaidChargeInjector.class);
+        inject("Mancato pagamento di multe", NotPaidChargeInjector.class, false);
 
-        inject("Possesso di stupefacenti", DrugInjector.class);
+        inject("Possesso di stupefacenti", DrugInjector.class, false);
 
-        inject("Guida senza Documenti", DocumentsInjector.class);
-        inject("Possesso di munizioni", AmmoInjector.class);
+        inject("Guida senza Documenti", DocumentsInjector.class, false);
+        inject("Possesso di munizioni", AmmoInjector.class, false);
 
-        injectPrecise("Evasione", EvasionInjector.class);
+        inject("Evasione", EvasionInjector.class, true);
 
-        inject("Atti osceni", SexInjector.class);
-        inject("Frode nell'esercizio del commercio", ScamInjector.class);
+        inject("Atti osceni", SexInjector.class, false);
+        inject("Frode nell'esercizio del commercio", ScamInjector.class, false);
 
-        inject("Evasione fiscale per mancato scontrino", TaxEvasionNoReceiptInjector.class);
-        inject("Evasione fiscale per scontrino con Importo Minore", TaxEvasionSmallerAmountInjector.class);
+        inject("Evasione fiscale per mancato scontrino", TaxEvasionNoReceiptInjector.class, false);
+        inject("Evasione fiscale per scontrino con Importo Minore", TaxEvasionSmallerAmountInjector.class, false);
 
-        inject("Mancato possesso di una Cassetta Postale", ArticleInjector.class);
-        inject("Mancata registrazione di un lotto", ArticleInjector.class);
-        inject("Regola del Buon Vicinato", ArticleInjector.class);
+        inject("Mancato possesso di una Cassetta Postale", ArticleInjector.class, false);
+        inject("Mancata registrazione di un lotto", ArticleInjector.class, false);
+        inject("Regola del Buon Vicinato", ArticleInjector.class, false);
     }
 }

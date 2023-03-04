@@ -3,14 +3,17 @@ package it.signorpollito.commands.impl;
 import it.signorpollito.commands.Command;
 import it.signorpollito.crime.Crime;
 import it.signorpollito.crime.CrimeCalculator;
+import it.signorpollito.crime.CrimesContainer;
 import it.signorpollito.repository.CommandHistory;
 import it.signorpollito.repository.CrimeRepository;
 import it.signorpollito.service.ServiciesManager;
 import it.signorpollito.utils.InputUtils;
 import it.signorpollito.utils.Utils;
 import lombok.SneakyThrows;
-import org.apache.commons.lang3.StringUtils;
 
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -32,37 +35,60 @@ public class CrimeCommand implements Command {
 
         CrimeCalculator crimeCalculator = new CrimeCalculator(InputUtils.requestString(scanner, "\nInserire nome soggetto: ", 3));
 
-        askCrimes(scanner, crimeCalculator);
+        if(!askCrimes(scanner, crimeCalculator))
+            return;
 
         crimeCalculator.completeQuestions(scanner);
 
-        var commands = crimeCalculator.getCommands();
-        String arrestDeclare = crimeCalculator.getArrestDeclare(false);
+        //-------------------------------//
 
-        Utils.clearConsole();
-        Utils.printHeader();
+        var commands = crimeCalculator.getCrimeCommands();
+        execute(crimeCalculator, commands);
 
-        printCrimes(crimeCalculator);
-        System.out.println("\n");
-        commands.forEach(System.out::println);
+        //-------------------------------//
 
-        System.out.println();
-        System.out.println(arrestDeclare);
+        commandHistory.addHistory(new CommandHistory.Group(crimeCalculator.getName(), commands));
 
-        commandHistory.addHistory(new CommandHistory.Group(crimeCalculator.getName(), commands, arrestDeclare));
-
+        System.out.println("\nTerminato, premere un tasto per continuare...");
         System.in.read(); //Wait for user input
     }
 
-    private void askCrimes(Scanner scanner, CrimeCalculator crimeCalculator) {
+    @SneakyThrows
+    private void execute(CrimeCalculator calculator, CrimesContainer container) {
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        var commands = container.getAll();
+
+        for(int i=0; i<commands.size(); i++) {
+            clipboard.setContents(new StringSelection(commands.get(i)), null);
+
+            Utils.clearConsole();
+            Utils.printHeader();
+
+            printCrimes(calculator);
+            printCommands(container);
+
+            System.out.printf("\n> Comando n.%d copiato! <\n", i+1);
+            System.out.println("Premi invio per copiare il possimo");
+
+            int input;
+            do { //To fix a Java bad design
+                input = System.in.read();
+            } while (input==10);
+        }
+    }
+
+    private boolean askCrimes(Scanner scanner, CrimeCalculator crimeCalculator) {
         boolean crimeNotFound = false;
 
         while (true) {
             Utils.clearConsole();
             Utils.printHeader();
 
+            System.out.println("- Per rimuovere reato inviare \"--rem <numero>\"");
+            System.out.println("- Per uscire o annullare, inserire 'q'.\n");
+
             printCrimes(crimeCalculator);
-            System.out.println("Per rimuovere reato inviare \"--rem <numero>\"\n");
+            System.out.println();
 
             if(crimeNotFound) System.out.println("> Reato non trovato! <");
             crimeNotFound = false;
@@ -71,6 +97,9 @@ public class CrimeCommand implements Command {
 
             if (input.startsWith("y"))
                 break;
+
+            if (input.startsWith("q"))
+                return false;
 
             System.out.println(input);
 
@@ -91,12 +120,14 @@ public class CrimeCommand implements Command {
 
             crimeCalculator.addCrime(crime.commitCrime());
         }
+
+        return true;
     }
 
     private Crime parseCrimeInput(Scanner scanner, String input) {
         List<Crime> matches = new ArrayList<>();
         for(var crime : crimeRepository.getCrimes())
-            if(StringUtils.containsIgnoreCase(crime.getFullName(), input))
+            if(crime.match(input, true, true))
                 matches.add(crime);
 
         if(matches.size()<=1) return matches.size()==0 ? null : matches.get(0);
@@ -118,5 +149,16 @@ public class CrimeCommand implements Command {
         int count = 1;
         for(var crime : crimeCalculator.getCrimes())
             System.out.printf("%d) %s\n", count++, crime.getFullName());
+    }
+
+    private void printCommands(CrimesContainer container) {
+        System.out.println("\n");
+        container.printCharges();
+
+        System.out.println();
+        container.printDeclare();
+
+        System.out.println();
+        container.printArrest();
     }
 }

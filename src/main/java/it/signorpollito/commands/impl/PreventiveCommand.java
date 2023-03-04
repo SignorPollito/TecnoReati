@@ -1,6 +1,7 @@
 package it.signorpollito.commands.impl;
 
 import it.signorpollito.commands.Command;
+import it.signorpollito.crime.CrimesContainer;
 import it.signorpollito.repository.CommandHistory;
 import it.signorpollito.service.ServiciesManager;
 import it.signorpollito.utils.InputUtils;
@@ -37,7 +38,7 @@ public class PreventiveCommand implements Command {
         System.out.println();
         System.out.println(declaration);
 
-        commandHistory.addHistory(new CommandHistory.Group(name, Collections.singleton(finalCommand), declaration));
+        commandHistory.addHistory(new CommandHistory.Group(name, new CrimesContainer(declaration, finalCommand, Collections.emptyList())));
 
         System.in.read(); //Wait for user input
     }

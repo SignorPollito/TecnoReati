@@ -2,27 +2,29 @@ package it.signorpollito.crime;
 
 import it.signorpollito.crime.injectors.Injector;
 import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Objects;
 
 public class Crime {
-    @Getter private final String name;
+    @Getter private String name;
     @Getter private final String article;
     @Getter private final String code;
-    @Getter private final String fullName;
+    @Getter private String fullName;
 
     @Getter private final int hours;
     @Getter private final int bail;
     @Getter private final int charge;
 
+    @Getter @Setter private String alias;
     protected Class<? extends Injector> injectorClass;
 
     public Crime(String name, String article, String code, int hours, int bail, int charge) {
-        this.name = name;
         this.article = article.strip();
         this.code = code;
-        this.fullName = String.format("%s (%s %s)", name, article, code);
+
+        changeName(name);
 
         this.hours = Math.max(0, hours);
         this.bail = Math.max(0, bail);
@@ -43,6 +45,18 @@ public class Crime {
     }
 
     /**
+     * Changes the name of the crime.
+     *
+     * @param newName The new name of the crime
+     * @return The crime with the new name!
+     */
+    public Crime changeName(String newName) {
+        this.name = newName;
+        this.fullName = String.format("%s (%s %s)", this.name, this.article, this.code);
+        return this;
+    }
+
+    /**
      * Checks if the provided name is this crime.
      *
      * @param name The name
@@ -59,10 +73,15 @@ public class Crime {
      * the crime name.
      *
      * @param name The name
+     * @param article True, if it should check also for the article in the name
+     * @param aliases True, if it should check also for the aliases
      * @return True if the provided name is present inside the crime name
      */
-    public boolean match(String name) {
-        return StringUtils.containsIgnoreCase(getName(), name);
+    public boolean match(String name, boolean article, boolean aliases) {
+        if(StringUtils.containsIgnoreCase(article ? getFullName() : getName(), name))
+            return true;
+
+        return aliases && alias != null && StringUtils.containsIgnoreCase(alias, name);
     }
 
     /**
@@ -70,15 +89,12 @@ public class Crime {
      * A single character or many words can be provided.
      * This method will check if the name is present inside
      * the crime name.
-     * <p>
-     * With the full match, its name is composed by crime name and
-     * also with its article, this should be used for a better search.
      *
      * @param name The name
      * @return True if the provided name is present inside the crime name
      */
-    public boolean matchFull(String name) {
-        return StringUtils.containsIgnoreCase(getFullName(), name);
+    public boolean match(String name) {
+        return match(name, false, false);
     }
 
     /**
@@ -97,7 +113,7 @@ public class Crime {
      * Sets a new injector to this crime.
      * Injectors are an advanced feature, and you should not
      * use them if you want to avoid miscalcultations of the arrest.
-     *
+     * <p>
      * Setting a custom injector, gives you the possibility of modifying
      * the name, bail, arrest and charge before it is used inside the command.
      * Injectors can also be used to ask more questions about the commited crime,

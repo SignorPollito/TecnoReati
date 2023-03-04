@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
 public class CrimeRepository {
@@ -20,24 +21,22 @@ public class CrimeRepository {
         return crimes.add(crime);
     }
 
-    public Crime getCrimePrecise(String name) {
+    public Crime getCrime(String name, boolean fullMatch) {
+        BiPredicate<Crime, String> matcher = fullMatch ? Crime::isCrime : Crime::match;
+
         for(var crime : crimes)
-            if(crime.isCrime(name))
+            if(matcher.test(crime, name))
                 return crime;
 
         return null;
     }
 
     public Crime getCrime(String name) {
-        for(var crime : crimes)
-            if(crime.match(name))
-                return crime;
-
-        return null;
+        return getCrime(name, false);
     }
 
-    public boolean editCrimePrecise(String name, Consumer<Crime> editor) {
-        Crime crime = getCrimePrecise(name);
+    public boolean editCrime(String name, Consumer<Crime> editor, boolean fullMatch) {
+        Crime crime = getCrime(name, fullMatch);
         if(crime==null) return false;
 
         editor.accept(crime);
@@ -45,19 +44,16 @@ public class CrimeRepository {
     }
 
     public boolean editCrime(String name, Consumer<Crime> editor) {
-        Crime crime = getCrime(name);
-        if(crime==null) return false;
-
-        editor.accept(crime);
-        return true;
+        return editCrime(name, editor, false);
     }
 
-    public boolean removeCrimePrecice(String name) {
-        return crimes.removeIf(crime -> crime.isCrime(name));
+    public boolean removeCrime(String name, boolean fullMatch) {
+        BiPredicate<Crime, String> matcher = fullMatch ? Crime::isCrime : Crime::match;
+        return crimes.removeIf(crime -> matcher.test(crime, name));
     }
 
     public boolean removeCrime(String name) {
-        return crimes.removeIf(crime -> crime.match(name));
+        return removeCrime(name, false);
     }
 
     public Collection<Crime> getCrimes() {

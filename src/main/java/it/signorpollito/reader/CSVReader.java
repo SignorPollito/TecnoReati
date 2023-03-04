@@ -2,6 +2,7 @@ package it.signorpollito.reader;
 
 import it.signorpollito.crime.ComposedCrime;
 import it.signorpollito.crime.Crime;
+import it.signorpollito.utils.Utils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -18,14 +19,6 @@ public class CSVReader {
 
     public CSVReader(File file) {
         this.file = file;
-    }
-
-    private String removeBrackets(String name) {
-        return name.split("\\(")[0].strip();
-    }
-
-    private String getBracketsContent(String name) {
-        return name.substring(name.indexOf("(")+1, Math.max(0, name.indexOf(")")));
     }
 
     private int parseInt(String number) {
@@ -56,7 +49,7 @@ public class CSVReader {
 
         subCrimes.add(base);
         subCrimes.forEach(crime -> {
-            String content = StringUtils.capitalize(getBracketsContent(crime.getName()));
+            String content = StringUtils.capitalize(Utils.getBracketsContent(crime.getName()));
 
             composedCrime.addSubCrime(new Crime(content.isBlank() ? "Reato normale" : content,
                     crime.getArticle(), crime.getCode(), crime.getHours(),
@@ -71,17 +64,17 @@ public class CSVReader {
         Set<Crime> finalCrimes = new HashSet<>();
 
         for(var crime : crimes) {
-            String name = removeBrackets(crime.getName());
+            String name = Utils.removeBrackets(crime.getName());
 
             List<Crime> subCrimes = new ArrayList<>();
             for(var subCrime : crimes) {
-                if(subCrime.isCrime(crime.getName()) || !removeBrackets(subCrime.getName()).equalsIgnoreCase(name))
+                if(subCrime.isCrime(crime.getName()) || !Utils.removeBrackets(subCrime.getName()).equalsIgnoreCase(name))
                     continue;
 
                 subCrimes.add(subCrime);
             }
 
-            finalCrimes.add(subCrimes.isEmpty() ? crime : composeCrime(name, crime, subCrimes));
+            finalCrimes.add(subCrimes.isEmpty() ? crime.changeName(name) : composeCrime(name, crime, subCrimes));
         }
 
         return finalCrimes;

@@ -84,14 +84,13 @@ public class CrimeCalculator {
             crimesString = crimesString==null ? name : "%s, %s".formatted(crimesString, name);
         }
 
-        if(crimesString==null) return "Da non arrestare";
+        if(crimesString==null) return null;
 
         String delaration = "La dichiaro in arresto per: ".concat(crimesString);
         return delaration.length()>TOTAL_NAME_CAP ? getArrestDeclare(true) : delaration;
     }
 
-    public List<String> getCommands() {
-        List<String> commands = new ArrayList<>();
+    public String getArrestCommand() {
         String crimesString = null;
 
         int hours = 0;
@@ -100,12 +99,7 @@ public class CrimeCalculator {
 
         for(var crime : crimes) {
             temp = crime.getHours();
-
-            if(crime.getCharge()!=0) {
-                commands.add(formattedChargeCommand(crime.getCharge(), crime.getCommandName(Crime.Type.CHARGE, NAME_CAP)));
-
-                if(temp==0) continue;
-            }
+            if(temp==0) continue;
 
             hours += temp;
 
@@ -118,7 +112,23 @@ public class CrimeCalculator {
             bail = crimeBail==0 ? -1 : bail + crimeBail;
         }
 
-        if(crimesString!=null) commands.add(formattedArrestCommand(hours, Math.max(0, bail), crimesString));
-        return commands;
+        return crimesString!=null ? formattedArrestCommand(hours, Math.max(0, bail), crimesString) : null;
+    }
+
+    public List<String> getCharges() {
+        List<String> charges = new ArrayList<>();
+
+        for(var crime : crimes) {
+            int temp = crime.getCharge();
+            if(temp==0) continue;
+
+            charges.add(formattedChargeCommand(crime.getCharge(), crime.getCommandName(Crime.Type.CHARGE, NAME_CAP)));
+        }
+
+        return charges;
+    }
+
+    public CrimesContainer getCrimeCommands() {
+        return new CrimesContainer(getArrestDeclare(false), getArrestCommand(), getCharges());
     }
 }
