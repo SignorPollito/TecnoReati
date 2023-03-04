@@ -17,7 +17,7 @@ I reati si aggiornano in automatico, in base ad una lista online, ogni qualvolta
 Non ho puntato a scrivere un codice perfetto, infatti non lo è, per un progetto così piccolo e fine a se stesso, è piuttosto inutile scrivere il doppio o il triplo del codice, solo per seguire le regole fondamentali della programmazione.
 
 - Non faccio infatti uso di Dependency Injection, ma mi affido ad un singleton a cui posso richiedere i vari servizi (code smell).
-- Non utilizzo interface o classi astratte per ogni oggetto, se non in un paio di casi dove si sono resi necessari, anche questa una cosa generalmente errata, anche se farebbe perdere troppo tempo per un progetto simile.
+- Non utilizzo interface o classi astratte per ogni oggetto, se non in un paio di casi dove si sono resi necessari, anche questa una cosa generalmente errata, ma farebbe perdere troppo tempo per un progetto simile.
 - Non rispetto tutti i principi SOLID
 - In generale alcuni parti di codice sono migliorabili (come sempre), ma ripeto, scritto per essere funzionale e leggibile.
 
