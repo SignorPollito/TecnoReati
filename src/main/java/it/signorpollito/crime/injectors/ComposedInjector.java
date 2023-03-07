@@ -33,12 +33,14 @@ public class ComposedInjector implements Injector {
 
     @Override
     public String modifyName(Crime crime, Crime.Type crimeType) {
-        return crime.getName();
+        return selection==null || subInjector==null ? crime.getName() : subInjector.modifyCommand(crime, crimeType);
     }
 
     @Override
     public String modifyCommand(Crime crime, Crime.Type crimeType) {
-        return selection==null ? crime.getFormattedArticle() : selection.getFormattedArticle();
+        if(selection==null) return crime.getFormattedArticle();
+
+        return subInjector==null ? selection.getFormattedArticle() : subInjector.modifyCommand(crime, crimeType);
     }
 
     @Override

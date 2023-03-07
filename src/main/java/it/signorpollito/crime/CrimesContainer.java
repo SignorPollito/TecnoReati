@@ -36,7 +36,7 @@ public class CrimesContainer {
         charges.forEach(System.out::println);
     }
 
-    public List<String> getAll() {
+    public List<String> getCommandList() {
         List<String> commands = new ArrayList<>(charges);
 
         if(declaration!=null) commands.add(declaration);

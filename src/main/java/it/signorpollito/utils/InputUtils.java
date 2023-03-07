@@ -4,6 +4,23 @@ import java.util.Scanner;
 
 public class InputUtils {
 
+    /**
+     * Waits for the user to press enter.
+     *
+     * @param scanner The scanner to be used
+     */
+    public static void waitForEnter(Scanner scanner) {
+        String read;
+
+        do {
+            read = scanner.nextLine();
+            if(read.isEmpty()) return;
+
+            read = scanner.hasNextLine() ? scanner.nextLine() : null;
+
+        } while (read!=null);
+    }
+
     public static int requestInteger(Scanner scanner, String message, int min, int max) {
         int number = -1;
 
@@ -11,16 +28,13 @@ public class InputUtils {
             if(number!=-1) System.out.println("\nNumero inserito non valido!");
             System.out.print(message);
 
-            while(!scanner.hasNextInt()) {
+            while((number = Utils.parseInt(scanner.nextLine(), -1))==-1) {
                 System.out.println("\nDevi inserire un numero!");
                 System.out.print(message);
-                scanner.next();
             }
 
-            number = scanner.nextInt();
         } while (number<min || number>max);
 
-        scanner.nextLine(); //For debug
         return number;
     }
 

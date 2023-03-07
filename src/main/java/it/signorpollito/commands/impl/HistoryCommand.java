@@ -3,6 +3,7 @@ package it.signorpollito.commands.impl;
 import it.signorpollito.commands.Command;
 import it.signorpollito.repository.CommandHistory;
 import it.signorpollito.service.ServiciesManager;
+import it.signorpollito.utils.InputUtils;
 import it.signorpollito.utils.Utils;
 import lombok.SneakyThrows;
 
@@ -28,9 +29,8 @@ public class HistoryCommand implements Command {
 
         groups.forEach(group -> {
             var container = group.getContainer();
-            System.out.printf("<-> Comandi su %s, ore %s <->\n", group.getCriminal(), group.getFormattedTime());
+            System.out.printf("[ Comandi su %s, ore %s ]\n", group.getCriminal(), group.getFormattedTime());
 
-            System.out.println("\n");
             container.printCharges();
 
             System.out.println();
@@ -39,9 +39,9 @@ public class HistoryCommand implements Command {
             System.out.println();
             container.printArrest();
 
-            System.out.print("\n\n\n");
+            System.out.print("\n\n|-----------------------------------------|\n");
         });
 
-        System.in.read(); //Wait for user input
+        InputUtils.waitForEnter(scanner);
     }
 }

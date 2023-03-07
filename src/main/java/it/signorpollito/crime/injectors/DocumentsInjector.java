@@ -24,13 +24,8 @@ public class DocumentsInjector implements Injector {
     }
 
     @Override
-    public String modifyName(Crime crime, Crime.Type crimeType) {
-        return "Guida senza documenti";
-    }
-
-    @Override
     public String modifyCommand(Crime crime, Crime.Type crimeType) {
-        return "Guida senza documenti %s".formatted(StringUtils.joinWith(",", documents));
+        return "%s %s".formatted(crime.getFormattedArticle(), StringUtils.joinWith(",", documents));
     }
 
     @Override

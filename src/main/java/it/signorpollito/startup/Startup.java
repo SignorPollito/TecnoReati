@@ -58,7 +58,7 @@ public class Startup {
 
         System.out.println("Registrando i reati nell'applicazione...");
 
-        if(!loadCrimesFromFolder(crimeFolder)) System.in.read();
+        if(!loadCrimesFromFolder(crimeFolder)) return;
 
         registerHardcodedCrimes();
         injectCustomizations();
@@ -153,6 +153,7 @@ public class Startup {
         setAlias("Immondizia nelle Strade", "inquinamento", false);
         setAlias("Parcheggio in luoghi inopportuni", "luogo non opportuno inopportuno", false);
         setAlias("Disturbo del Lavoro", "chiamate futili", false);
+        setAlias("Procurata inosservanza di pena", "complicità in fuga", false);
     }
 
     private void inject(String crimeName, Class<? extends Injector> injector, boolean fullMatch) {

@@ -31,6 +31,6 @@ public class CommandService {
         for(var command : commands)
             System.out.printf("%d) %s\n", count++, command.getDisplayName());
 
-        executeCommand(InputUtils.requestInteger(scanner, "Selezionare comando: ", 1, commands.size())-1);
+        executeCommand(InputUtils.requestInteger(scanner, "Selezionare comando: ", 1, commands.size()) - 1);
     }
 }

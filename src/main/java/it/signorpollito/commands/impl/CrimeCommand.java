@@ -6,14 +6,12 @@ import it.signorpollito.crime.CrimeCalculator;
 import it.signorpollito.crime.CrimesContainer;
 import it.signorpollito.repository.CommandHistory;
 import it.signorpollito.repository.CrimeRepository;
+import it.signorpollito.service.CopyService;
 import it.signorpollito.service.ServiciesManager;
 import it.signorpollito.utils.InputUtils;
 import it.signorpollito.utils.Utils;
-import lombok.SneakyThrows;
+import org.apache.commons.lang3.StringUtils;
 
-import java.awt.*;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -27,7 +25,6 @@ public class CrimeCommand implements Command {
         return "Calcola la pena di un soggetto";
     }
 
-    @SneakyThrows
     @Override
     public void execute(Scanner scanner) {
         Utils.clearConsole();
@@ -43,38 +40,31 @@ public class CrimeCommand implements Command {
         //-------------------------------//
 
         var commands = crimeCalculator.getCrimeCommands();
-        execute(crimeCalculator, commands);
+        copyCommands(scanner, crimeCalculator, commands);
 
         //-------------------------------//
 
         commandHistory.addHistory(new CommandHistory.Group(crimeCalculator.getName(), commands));
 
-        System.out.println("\nTerminato, premere un tasto per continuare...");
-        System.in.read(); //Wait for user input
+        System.out.println("\nTerminato, premere INVIO per continuare...");
+        InputUtils.waitForEnter(scanner);
     }
 
-    @SneakyThrows
-    private void execute(CrimeCalculator calculator, CrimesContainer container) {
-        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-        var commands = container.getAll();
-
-        for(int i=0; i<commands.size(); i++) {
-            clipboard.setContents(new StringSelection(commands.get(i)), null);
-
+    private void copyCommands(Scanner scanner, CrimeCalculator calculator, CrimesContainer container) {
+        new CopyService(container.getCommandList()).copyEach(phrase -> {
             Utils.clearConsole();
             Utils.printHeader();
 
-            printCrimes(calculator);
+            System.out.println("Comandi da eseguire:");
             printCommands(container);
+            System.out.println("\n|---------------------------------------------------|\n");
+            printCrimes(calculator);
 
-            System.out.printf("\n> Comando n.%d copiato! <\n", i+1);
-            System.out.println("Premi invio per copiare il possimo");
+            System.out.printf("\n\n%s\n", StringUtils.abbreviate(phrase, 50));
+            System.out.println("Frase copiata, premi INVIO per la prossima!");
 
-            int input;
-            do { //To fix a Java bad design
-                input = System.in.read();
-            } while (input==10);
-        }
+            InputUtils.waitForEnter(scanner);
+        });
     }
 
     private boolean askCrimes(Scanner scanner, CrimeCalculator crimeCalculator) {
@@ -85,7 +75,7 @@ public class CrimeCommand implements Command {
             Utils.printHeader();
 
             System.out.println("- Per rimuovere reato inviare \"--rem <numero>\"");
-            System.out.println("- Per uscire o annullare, inserire 'q'.\n");
+            System.out.println("- Per uscire o annullare, inserire 'q'.\n\n");
 
             printCrimes(crimeCalculator);
             System.out.println();
@@ -95,13 +85,8 @@ public class CrimeCommand implements Command {
 
             String input = InputUtils.requestString(scanner, "Inserire nome reato: (y per confermare) ");
 
-            if (input.startsWith("y"))
-                break;
-
-            if (input.startsWith("q"))
-                return false;
-
-            System.out.println(input);
+            if (input.startsWith("y")) break;
+            if (input.startsWith("q")) return false;
 
             if(input.startsWith("--rem")) {
                 String[] fields = input.split(" ");
@@ -146,13 +131,18 @@ public class CrimeCommand implements Command {
     private void printCrimes(CrimeCalculator crimeCalculator) {
         System.out.println("Reati commessi da ".concat(crimeCalculator.getName()));
 
-        int count = 1;
-        for(var crime : crimeCalculator.getCrimes())
-            System.out.printf("%d) %s\n", count++, crime.getFullName());
+        var crimes = crimeCalculator.getCrimes();
+        if(crimes.size()==0) {
+            System.out.println("> Nessun crimine selezionato <");
+            return;
+        }
+
+        for (int i = 0; i < crimes.size(); i++)
+            System.out.printf("%d) %s\n", i+1, crimes.get(i).getFullName());
+
     }
 
     private void printCommands(CrimesContainer container) {
-        System.out.println("\n");
         container.printCharges();
 
         System.out.println();
