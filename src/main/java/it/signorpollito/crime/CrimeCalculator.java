@@ -112,7 +112,7 @@ public class CrimeCalculator {
             bail = crimeBail==0 ? -1 : bail + crimeBail;
         }
 
-        return crimesString!=null ? formattedArrestCommand(hours, Math.max(0, bail), crimesString) : null;
+        return crimesString!=null ? formattedArrestCommand(Math.min(336, hours), Math.max(0, bail), crimesString) : null;
     }
 
     public List<String> getCharges() {
