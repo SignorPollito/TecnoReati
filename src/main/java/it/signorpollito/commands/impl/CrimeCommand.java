@@ -58,6 +58,12 @@ public class CrimeCommand implements Command {
             System.out.println("Comandi da eseguire:");
             printCommands(container);
             System.out.println("\n|---------------------------------------------------|\n");
+            if(!container.isAllFdr()) {
+                System.out.println("ATTENZIONE! Hai inserito dei reati che non hanno la Flagranza di Reato:");
+                System.out.printf("            %s%n", StringUtils.join(container.getNonFdr()));
+                System.out.println("            Assicurati di aver richiesto il T.E. dal Magistrato!\n");
+            }
+
             printCrimes(calculator);
 
             System.out.printf("\n\n%s\n", StringUtils.abbreviate(phrase, 50));

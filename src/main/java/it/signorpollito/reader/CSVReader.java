@@ -32,19 +32,23 @@ public class CSVReader {
     private int parseHours(String field) {
         if(field.isBlank()) return 0;
 
-        field = field.split(" ")[0];
-        return parseInt(field.substring(0, field.length()-1).strip());
+        String[] split = field.split(" ");
+        return parseInt(split[0]) * (split.length>=2 && split[1].contains("giorn") ? 24 : 1);
     }
 
     private int parseMoney(String field) {
-        return parseInt(field.replaceAll("[.|+|€]", "").strip().split(" ")[0]);
+        return parseInt(field.replaceAll(",.*", "").replaceAll("[^0-9]+", ""));
+    }
+
+    private boolean parseBoolean(String field) {
+        return field.equals("TRUE");
     }
 
     private ComposedCrime composeCrime(String name, Crime base, Collection<Crime> subCrimes) {
         ComposedCrime composedCrime = new ComposedCrime(
                 name, base.getArticle(),
                 base.getCode(), base.getHours(),
-                base.getBail(), base.getCharge()
+                base.getGenericPayout(), base.isFdr()
         );
 
         subCrimes.add(base);
@@ -53,7 +57,7 @@ public class CSVReader {
 
             composedCrime.addSubCrime(new Crime(content.isBlank() ? "Reato normale" : content,
                     crime.getArticle(), crime.getCode(), crime.getHours(),
-                    crime.getBail(), crime.getCharge()
+                    crime.getGenericPayout(), crime.isFdr()
             ));
         });
 
@@ -80,7 +84,7 @@ public class CSVReader {
         return finalCrimes;
     }
 
-    public Collection<Crime> getCrimes() {
+    public Collection<Crime> getCrimes(String code) {
         Collection<Crime> tempCrimes = new HashSet<>();
 
         try(CSVParser parser = CSVParser.parse(file, StandardCharsets.UTF_8, CSVFormat.DEFAULT)) {
@@ -95,10 +99,10 @@ public class CSVReader {
                 if (record.size() < 5) continue;
 
                 tempCrimes.add(new Crime(record.get(1),
-                        record.get(5), record.get(6),
-                        parseHours(record.get(3)),
-                        parseMoney(record.get(4)),
-                        parseMoney(record.get(2))
+                        record.get(0), code,
+                        parseHours(record.get(2)),
+                        parseMoney(record.get(3)),
+                        parseBoolean(record.get(4))
                 ));
             }
 

@@ -10,6 +10,7 @@ import it.signorpollito.crime.injectors.*;
 import it.signorpollito.reader.CSVReader;
 import it.signorpollito.repository.CrimeRepository;
 import it.signorpollito.service.ServiciesManager;
+import lombok.Getter;
 import lombok.SneakyThrows;
 
 import java.io.File;
@@ -18,12 +19,22 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.Collection;
 
 public class Startup {
 
     private static boolean STARTED = false;
     private static final String DEFAULT_FOLDER = "Reati";
+
+    /**
+     * TODO
+     *
+     * Aggiungere check per Flagranza di Reato (TRUE/FALSE)
+     * Se FdR è TRUE allora vuol dire che si può arrestare direttamente.
+     * Se c'è anche solo un reato FALSE allora mandare avviso nel programma.
+     *
+     */
 
     public static void start() {
         if(STARTED) throw new IllegalStateException("The program has already started!");
@@ -38,27 +49,27 @@ public class Startup {
     private Startup() {
         this.crimeRepository = ServiciesManager.getInstance().getCrimeRepository();
 
-        startApplication(Map.of(
-                "Codice Civile", "https://docs.google.com/spreadsheets/d/1uzmU1XEv6RXfNO7O4Ht16Wb8Rdf1bnKqrQ4j7Ympalo/export?gid=0&format=csv",
-                "Codice Stradale", "https://docs.google.com/spreadsheets/d/1uzmU1XEv6RXfNO7O4Ht16Wb8Rdf1bnKqrQ4j7Ympalo/export?gid=640355816&format=csv",
-                "Codice Penale", "https://docs.google.com/spreadsheets/d/1uzmU1XEv6RXfNO7O4Ht16Wb8Rdf1bnKqrQ4j7Ympalo/export?gid=1698806507&format=csv"
+        startApplication(Arrays.asList(
+                new Code("Codice Civile", "CC", "https://docs.google.com/spreadsheets/d/1nGH7mVfH-a-i8h5E91X6cib0zZLMH6BDOHbK69VJdpE/export?gid=1782618121&format=csv"),
+                new Code("Codice Stradale", "CS", "https://docs.google.com/spreadsheets/d/1nGH7mVfH-a-i8h5E91X6cib0zZLMH6BDOHbK69VJdpE/export?gid=369345429&format=csv"),
+                new Code("Codice Penale", "CP", "https://docs.google.com/spreadsheets/d/1nGH7mVfH-a-i8h5E91X6cib0zZLMH6BDOHbK69VJdpE/export?gid=0&format=csv")
         ));
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @SneakyThrows
-    private void startApplication(Map<String, String> codes) {
+    private void startApplication(Collection<Code> codes) {
         System.out.println("Aggiornando la Lista Reati...");
 
         File crimeFolder = new File(DEFAULT_FOLDER);
         if(!crimeFolder.exists()) crimeFolder.mkdirs();
 
         deleteOldFiles(DEFAULT_FOLDER);
-        updateCrimeList(codes, DEFAULT_FOLDER);
+        updateCrimeList(codes);
 
         System.out.println("Registrando i reati nell'applicazione...");
 
-        if(!loadCrimesFromFolder(crimeFolder)) return;
+        codes.forEach(code -> loadCrimesFromFile(new File(code.getPath()), code.getAcronym()));
 
         registerHardcodedCrimes();
         injectCustomizations();
@@ -96,10 +107,10 @@ public class Startup {
             content.delete();
     }
 
-    private void updateCrimeList(Map<String, String> codes, String folderPath) {
-        codes.forEach((name, url) -> {
-            try(FileOutputStream fileOutputStream = new FileOutputStream("%s/ListaReati - %s.csv".formatted(folderPath, name))) {
-                ReadableByteChannel readableByteChannel = Channels.newChannel(new URL(url).openStream());
+    private void updateCrimeList(Collection<Code> codes) {
+        codes.forEach(code-> {
+            try(FileOutputStream fileOutputStream = new FileOutputStream(code.getPath())) {
+                ReadableByteChannel readableByteChannel = Channels.newChannel(new URL(code.getUrl()).openStream());
 
                 fileOutputStream.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
 
@@ -109,25 +120,13 @@ public class Startup {
         });
     }
 
-    private void loadCrimesFromFile(File file) {
+    private void loadCrimesFromFile(File file, String code) {
         if(!file.exists() || !file.isFile()) {
             System.out.printf("File reati non trovato, assicurati che si chiami \"%s\"\n", file.getName());
             return;
         }
 
-        new CSVReader(file).getCrimes().forEach(crimeRepository::registerCrime);
-    }
-
-    private boolean loadCrimesFromFolder(File folder) {
-        if(!folder.exists() || !folder.isDirectory()) {
-            System.out.printf("Cartella reati non trovata, assicurati che si chiami \"%s\"\n", folder.getName());
-            return false;
-        }
-
-        for(var file : getFilesInFolder(folder))
-            loadCrimesFromFile(file);
-
-        return true;
+        new CSVReader(file).getCrimes(code).forEach(crimeRepository::registerCrime);
     }
 
     private void registerHardcodedCrimes() {
@@ -137,8 +136,8 @@ public class Startup {
         crimeRepository.removeCrime("Evasione (si costituisce)", true);
 
         //ADDING
-        crimeRepository.registerCrime(new Crime("Possesso di stupefacenti", "Art. 150", "CP", 0, 0, 0));
-        crimeRepository.registerCrime(new Crime("Evasione", "Art. 93", "CP", 0, 0, 0));
+        crimeRepository.registerCrime(new Crime("Possesso di stupefacenti", "Art. 150", "CP", 0, 0, true));
+        //crimeRepository.registerCrime(new Crime("Evasione", "Art. 93", "CP", 0, 0, true));
     }
 
     private void registerAliases() {
@@ -146,8 +145,10 @@ public class Startup {
                 "Mancato fermo al controllo/blocco stradale Proseguimento della guida senza documenti", false
         );
 
+        setAlias("Detenzione abusiva di armi", "arma coltello pistola", false);
+        setAlias("Omessa consegna di armi", "arma coltello pistola", false);
         setAlias("Mancato pagamento di multe", "multa sanzione", false);
-        setAlias("Possesso di stupefacenti", "droga droghe stupefacente", false);
+        setAlias("Possesso di stupefacenti", "droga droghe stupefacente traffico", false);
         setAlias("Inosservanza dei provvedimenti", "cinturamento", false);
         setAlias("Introduzione clandestina in luoghi militari", "zona militare", false);
         setAlias("Immondizia nelle Strade", "inquinamento", false);
@@ -172,16 +173,33 @@ public class Startup {
         inject("Guida senza Documenti", DocumentsInjector.class, false);
         inject("Possesso di munizioni", AmmoInjector.class, false);
 
-        inject("Evasione", EvasionInjector.class, true);
+        //inject("Evasione", EvasionInjector.class, true);
 
-        inject("Atti osceni", SexInjector.class, false);
+        //inject("Atti osceni", SexInjector.class, false);
         inject("Frode nell'esercizio del commercio", ScamInjector.class, false);
 
         inject("Evasione fiscale per mancato scontrino", TaxEvasionNoReceiptInjector.class, false);
-        inject("Evasione fiscale per scontrino con Importo Minore", TaxEvasionSmallerAmountInjector.class, false);
+        inject("Evasione fiscale per scontrino con importo minore", TaxEvasionSmallerAmountInjector.class, true);
 
-        inject("Mancato possesso di una Cassetta Postale", ArticleInjector.class, false);
+        inject("Mancata cassetta postale", ArticleInjector.class, false);
         inject("Mancata registrazione di un lotto", ArticleInjector.class, false);
         inject("Regola del Buon Vicinato", ArticleInjector.class, false);
+    }
+
+
+    @Getter
+    private static class Code {
+
+        private final String name;
+        private final String acronym;
+        private final String path;
+        private final String url;
+
+        public Code(String name, String acronym, String url) {
+            this.name = name;
+            this.acronym = acronym;
+            this.url = url;
+            this.path = "%s/ListaReati - %s.csv".formatted(DEFAULT_FOLDER, name);
+        }
     }
 }

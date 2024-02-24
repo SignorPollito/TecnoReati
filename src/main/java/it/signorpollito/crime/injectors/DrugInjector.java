@@ -50,7 +50,7 @@ public class DrugInjector implements Injector {
     public String modifyName(Crime crime, Crime.Type crimeType) {
         return crimeType==Crime.Type.ARREST && category.isCategory(1) ?
                 "Art. 150-bis del C.P." :
-                "Possesso di stupefacenti".concat(hided ? " e Art. 150-bis del C.P." : "");
+                "Art. 150".concat(hided ? " e Art. 150-bis del C.P." : "");
     }
 
     @Override

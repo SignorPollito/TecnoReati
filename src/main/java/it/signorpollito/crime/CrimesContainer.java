@@ -9,19 +9,29 @@ import java.util.List;
 
 public class CrimesContainer {
 
-    private final List<String> charges;
+    private final Collection<String> charges;
+    private final Collection<String> nonFdr;
     @Getter private final String declaration;
     @Getter private final String arrest;
 
-    public CrimesContainer(String declaration, String arrest, Collection<String> charges) {
+    public CrimesContainer(String declaration, String arrest, Collection<String> nonFdr, Collection<String> charges) {
         this.declaration = declaration;
         this.arrest = arrest;
 
-        this.charges = new ArrayList<>(charges);
+        this.charges = charges;
+        this.nonFdr = nonFdr;
+    }
+
+    public boolean isAllFdr() {
+        return nonFdr.isEmpty();
     }
 
     public Collection<String> getCharges() {
         return Collections.unmodifiableCollection(charges);
+    }
+
+    public Collection<String> getNonFdr() {
+        return Collections.unmodifiableCollection(nonFdr);
     }
 
     public void printDeclare() {

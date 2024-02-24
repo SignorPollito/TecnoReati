@@ -36,7 +36,7 @@ public class PreventiveCommand implements Command {
 
         commandHistory.addHistory(new CommandHistory.Group(name, new CrimesContainer(
                 "La dichiaro in arresto preventivo",
-                finalCommand, Collections.emptyList())
+                finalCommand, Collections.emptyList(), Collections.emptyList())
         ));
 
         System.out.println("\nComando di arresto copiato, premere INVIO per continuare...");

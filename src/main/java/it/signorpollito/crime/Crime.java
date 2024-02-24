@@ -16,19 +16,27 @@ public class Crime {
     @Getter private final int hours;
     @Getter private final int bail;
     @Getter private final int charge;
+    @Getter private final boolean fdr;
 
     @Getter @Setter private String alias;
     protected Class<? extends Injector> injectorClass;
 
-    public Crime(String name, String article, String code, int hours, int bail, int charge) {
+    public Crime(String name, String article, String code, int hours, int payout, boolean fdr) {
         this.article = article.strip();
         this.code = code;
 
         changeName(name);
 
         this.hours = Math.max(0, hours);
-        this.bail = Math.max(0, bail);
-        this.charge = Math.max(0, charge);
+        if(hours<=0) {
+            this.charge = Math.max(0, payout);
+            this.bail = 0;
+        } else {
+            this.bail = Math.max(0, payout);
+            this.charge = 0;
+        }
+
+        this.fdr = fdr;
     }
 
     protected Injector createInjector(Class<? extends Injector> injectorClass) {
@@ -107,6 +115,10 @@ public class Crime {
      */
     public String getFormattedArticle() {
         return String.format("%s %s", getArticle(), getCode());
+    }
+
+    public int getGenericPayout() {
+        return charge<=0 ? bail : charge;
     }
 
     /**

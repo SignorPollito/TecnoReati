@@ -11,8 +11,8 @@ public class ComposedCrime extends Crime {
     private final List<Crime> subCrimes;
     private Class<? extends Injector> subInjector;
 
-    public ComposedCrime(String name, String article, String code, int hours, int bail, int charge) {
-        super(name, article, code, hours, bail, charge);
+    public ComposedCrime(String name, String article, String code, int hours, int payout, boolean fdr) {
+        super(name, article, code, hours, payout, fdr);
 
         this.subCrimes = new ArrayList<>();
         injectorClass = ComposedInjector.class;

@@ -3,6 +3,7 @@ package it.signorpollito.crime;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ThreadLocalRandom;
@@ -87,7 +88,7 @@ public class CrimeCalculator {
         if(crimesString==null) return null;
 
         String delaration = "La dichiaro in arresto per: ".concat(crimesString);
-        return delaration.length()>TOTAL_NAME_CAP ? getArrestDeclare(true) : delaration;
+        return delaration.length()>TOTAL_NAME_CAP && !compacted ? getArrestDeclare(true) : delaration;
     }
 
     public String getArrestCommand() {
@@ -128,7 +129,17 @@ public class CrimeCalculator {
         return charges;
     }
 
+    public List<String> getNonFdr() {
+        List<String> nonFdr = new ArrayList<>();
+
+        for(var crime : crimes)
+            if(crime.getHours()>0 && !crime.getCrime().isFdr())
+                nonFdr.add(crime.getArticleForName(Crime.Type.ARREST));
+
+        return nonFdr;
+    }
+
     public CrimesContainer getCrimeCommands() {
-        return new CrimesContainer(getArrestDeclare(false), getArrestCommand(), getCharges());
+        return new CrimesContainer(getArrestDeclare(false), getArrestCommand(), getNonFdr(), getCharges());
     }
 }
