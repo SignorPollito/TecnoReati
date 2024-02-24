@@ -27,15 +27,6 @@ public class Startup {
     private static boolean STARTED = false;
     private static final String DEFAULT_FOLDER = "Reati";
 
-    /**
-     * TODO
-     *
-     * Aggiungere check per Flagranza di Reato (TRUE/FALSE)
-     * Se FdR è TRUE allora vuol dire che si può arrestare direttamente.
-     * Se c'è anche solo un reato FALSE allora mandare avviso nel programma.
-     *
-     */
-
     public static void start() {
         if(STARTED) throw new IllegalStateException("The program has already started!");
 
