@@ -1,7 +1,6 @@
 # TecnoReati
 
 [![CodeFactor](https://www.codefactor.io/repository/github/signorpollito/tecnoreati/badge)](https://www.codefactor.io/repository/github/signorpollito/tecnoreati)
-![Snyk Vulnerabilities for GitHub Repo](https://img.shields.io/snyk/vulnerabilities/github/SignorPollito/TecnoReati)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/SignorPollito/TecnoReati)
 
 Applicazione per PC (dovrebbe andare per su tutti gli OS) scritta in Java.
